@@ -43,25 +43,24 @@ const atracoesDb = [
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
   const [filtroAtivo, setFiltroAtivo] = useState('all');
-  
-  // 1. CRIAMOS O ESTADO PARA O CARRINHO/FAVORITOS
   const [favoritos, setFavoritos] = useState([]); 
+  
+  // NOVO ESTADO: Guarda os dados do local que o usuário clicou para ver os detalhes
+  const [localSelecionado, setLocalSelecionado] = useState(null);
   
   const location = useLocation();
 
-  // 2. RECUPERAMOS OS FAVORITOS SALVOS NO NAVEGADOR AO ABRIR A PÁGINA
   useEffect(() => {
     const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
     setFavoritos(favsSalvos);
   }, []);
 
-  // 3. FUNÇÃO PARA ADICIONAR OU REMOVER DO CARRINHO/FAVORITOS
   const toggleFav = (id) => {
     let novosFavs;
     if (favoritos.includes(id)) {
-      novosFavs = favoritos.filter((f) => f !== id); // Tira da lista
+      novosFavs = favoritos.filter((f) => f !== id); 
     } else {
-      novosFavs = [...favoritos, id]; // Coloca na lista
+      novosFavs = [...favoritos, id]; 
     }
     setFavoritos(novosFavs);
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
@@ -119,11 +118,7 @@ export default function Explorar() {
           {atracoes.map(attr => (
             <div className="col-lg-4 col-md-6" key={attr.id}>
               <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                
-                {/* DIV DA IMAGEM: Adicionei position: relative para o coração flutuar aqui */}
                 <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
-                  
-                  {/* BOTÃO DE CORAÇÃO/CARRINHO VOLTOU AQUI */}
                   <button 
                     onClick={() => toggleFav(attr.id)}
                     style={{
@@ -136,9 +131,7 @@ export default function Explorar() {
                   >
                     <i className="fas fa-heart"></i>
                   </button>
-
                 </div>
-
                 <div className="card-body d-flex flex-column p-4">
                   <span className={`badge bg-light text-dark mb-2 align-self-start`}>{attr.tag}</span>
                   <h5 className="fw-bold">{attr.titulo}</h5>
@@ -146,14 +139,13 @@ export default function Explorar() {
                   <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                     <span className="fw-bold text-success">{attr.preco}</span>
                     
-                    {/* BOTÃO DE VER DETALHES AGORA COM A AÇÃO ONCLICK */}
+                    {/* QUANDO CLICAR, AVISA O REACT QUAL LOCAL DEVE ABRIR NA JANELA */}
                     <button 
                       className="btn btn-sm btn-outline-dark fw-bold"
-                      onClick={() => alert(`Você clicou para ver os detalhes de: ${attr.titulo}`)}
+                      onClick={() => setLocalSelecionado(attr)}
                     >
                       Ver Detalhes
                     </button>
-
                   </div>
                 </div>
               </div>
@@ -161,6 +153,66 @@ export default function Explorar() {
           ))}
         </div>
       </main>
+
+      {/* A JANELA (MODAL) COMEÇA AQUI */}
+      {localSelecionado && (
+        <div 
+          onClick={() => setLocalSelecionado(null)} // Clicar fora da janela fecha ela
+          style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999,
+            display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px'
+          }}
+        >
+          {/* Caixa Branca da Janela */}
+          <div 
+            onClick={(e) => e.stopPropagation()} // Impede que o clique dentro da caixa feche a janela
+            style={{
+              background: '#fff', borderRadius: '20px', maxWidth: '500px', width: '100%',
+              overflow: 'hidden', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
+            }}
+          >
+            {/* Botão de Fechar no canto */}
+            <button 
+              onClick={() => setLocalSelecionado(null)}
+              style={{
+                position: 'absolute', top: '15px', right: '15px', zIndex: 10,
+                background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%',
+                width: '36px', height: '36px', fontWeight: 'bold', cursor: 'pointer'
+              }}
+            >
+              <i className="fas fa-times"></i>
+            </button>
+
+            {/* Imagem Gigante */}
+            <div style={{ height: '250px', backgroundImage: `url(${localSelecionado.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+            
+            {/* Corpo da Janela */}
+            <div className="p-4 p-md-5">
+              <span className="badge bg-light text-dark mb-2">{localSelecionado.tag}</span>
+              <h3 className="fw-bold mb-3">{localSelecionado.titulo}</h3>
+              <p className="text-muted mb-4" style={{ lineHeight: '1.6' }}>{localSelecionado.descricao}</p>
+              
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2 pt-4 border-top">
+                <h4 className="fw-bold text-success m-0 mb-3 mb-sm-0">{localSelecionado.preco}</h4>
+                
+                {/* Botão de Adicionar ao Carrinho dentro da Janela */}
+                <button 
+                  className={`btn px-4 py-2 fw-bold rounded-pill ${favoritos.includes(localSelecionado.id) ? 'btn-danger' : 'btn-success'}`}
+                  onClick={() => {
+                    toggleFav(localSelecionado.id);
+                  }}
+                >
+                  <i className={`fas ${favoritos.includes(localSelecionado.id) ? 'fa-trash' : 'fa-cart-plus'} me-2`}></i>
+                  {favoritos.includes(localSelecionado.id) ? 'Remover' : 'Colocar no Carrinho'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* FIM DA JANELA (MODAL) */}
+
     </div>
   );
 }
