@@ -132,7 +132,7 @@ export default function Home() {
           <div className="glass-card mx-auto bg-light rounded-4 p-5 border" style={{ maxWidth: '850px' }}>
             <h2 className="fw-bold mb-3 text-dark">Conecte seu negócio a novos exploradores.</h2>
             <p className="text-muted mb-4 px-lg-4">
-              O BoeMinha é a viitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
+              O BoeMinha é a viaitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
             </p>
             <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
               <Link to="/midia-kit" className="btn btn-success rounded-pill px-4 py-2 fw-bold">VER MÍDIA KIT</Link>
