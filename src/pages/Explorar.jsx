@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// BANCO DE DADOS ATUALIZADO COM COORDENADAS PARA O MAPA E CATEGORIA GASTRONOMIA
+// BANCO DE DADOS COMPLETO COM AS COORDENADAS
 const atracoesDb = [
   // --- CULTURA ---
   {
@@ -50,7 +50,7 @@ const atracoesDb = [
   // --- NATUREZA ---
   {
     id: "costao",
-    titulo: "Costão de Itacoatiara",
+    titulo: "lindoa costão de Itacoatiara",
     categoria: "natureza",
     tag: "Trilha & Mirante",
     descricao: "Trilha clássica com visual panorâmico do Oceano Atlântico.",
@@ -203,11 +203,6 @@ export default function Explorar() {
   
   const location = useLocation();
 
-  // REFERÊNCIAS DO MAPA
-  const mapRef = useRef(null);
-  const markersLayerRef = useRef(null);
-
-  // CARREGA OS FAVORITOS DA MEMÓRIA
   useEffect(() => {
     const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
     setFavoritos(favsSalvos);
@@ -243,52 +238,91 @@ export default function Explorar() {
         qtd: 1
       });
     }
-
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // LÓGICA PARA ATUALIZAR O MAPA SEMPRE QUE A LISTA MUDAR (AQUI ESTÁ O CONSERTO DOS PINOS!)
+  // ======================================================================
+  // NOVO EFFECT DO MAPA COM RESET E PINOS TEMÁTICOS EM CSS PURÍSSIMO!
+  // ======================================================================
   useEffect(() => {
-    if (!mapRef.current) {
-      // Inicia o mapa na primeira vez
-      mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-      }).addTo(mapRef.current);
+    // 1. Criamos o mapa direto na função. Toda vez que o código rodar, ele mata o zumbi anterior
+    const mapa = L.map('map-container').setView([-22.92, -43.08], 12);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(mapa);
+
+    const markersLayer = L.layerGroup().addTo(mapa);
+
+    // 2. Função que desenha o pino com HTML e põe o ícone certo do FontAwesome lá dentro!
+    const obterPinoModerno = (categoria, isFavoritoView) => {
+      let cor = '#0077b6'; // Azul Padrão (Cultura)
+      let icone = 'fa-palette'; 
       
-      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
-    }
+      if (isFavoritoView) {
+        cor = '#9b59b6'; // Roxo para Favoritos
+        icone = 'fa-heart';
+      } else if (categoria === 'natureza') {
+        cor = '#2d6a4f'; // Verde para Natureza
+        icone = 'fa-tree';
+      } else if (categoria === 'boemia') {
+        cor = '#d68c45'; // Laranja para Boemia
+        icone = 'fa-beer';
+      } else if (categoria === 'gastronomia') {
+        cor = '#e63946'; // Vermelho para Gastronomia
+        icone = 'fa-coffee';
+      }
 
-    // Limpa os pontos antigos
-    markersLayerRef.current.clearLayers();
+      // Desenhamos um pino arredondado moderno usando bordas HTML (ponta pra baixo)
+      const pinoHTML = `
+        <div style="
+          background-color: ${cor};
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid white;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        ">
+          <i class="fas ${icone}" style="color: white; transform: rotate(45deg); font-size: 13px;"></i>
+        </div>
+      `;
 
-    // CRIANDO O ÍCONE MANUALMENTE (À prova de falhas no React!)
-    const pinoPersonalizado = new L.Icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
+      return L.divIcon({
+        className: '', // Deixar vazio força o Leaflet a apagar o pino azul original
+        html: pinoHTML,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], 
+        popupAnchor: [0, -32] 
+      });
+    };
 
-    // Adiciona os pontos novos baseados na lista atual filtrada usando o ícone consertado
+    // 3. Adiciona os novos pinos temáticos
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
-        const marker = L.marker([attr.lat, attr.lng], { icon: pinoPersonalizado }).bindPopup(`<b>${attr.titulo}</b>`);
-        markersLayerRef.current.addLayer(marker);
+        const iconePronto = obterPinoModerno(attr.categoria, filtroAtivo === 'favoritos');
+        L.marker([attr.lat, attr.lng], { icon: iconePronto })
+         .bindPopup(`<b>${attr.titulo}</b>`)
+         .addTo(markersLayer);
       }
     });
 
-    // Centraliza o mapa dando zoom para mostrar todos os locais da tela
+    // 4. Ajusta o enquadramento do mapa
     const bounds = atracoes.filter(a => a.lat && a.lng).map((a) => [a.lat, a.lng]);
     if (bounds.length > 0) {
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      mapa.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [atracoes]); 
 
-  // BUSCA PELA BARRA DE PESQUISA DA HOME
+    // 5. A CHAVE MÁGICA: Quando o componente recarregar, destrói o mapa antigo da memória!
+    return () => {
+      mapa.remove();
+    };
+  }, [atracoes, filtroAtivo]); 
+  // ======================================================================
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const termoBuscado = params.get("busca");
@@ -328,16 +362,14 @@ export default function Explorar() {
 
       <main className="container mb-5 mt-4">
         
-        {/* === MAPA REINTEGRADO AQUI === */}
         <h4 className="fw-bold mb-3">
           <i className="fas fa-map-marked-alt me-2 text-success"></i>
           Visão Geral
         </h4>
         <div 
           id="map-container" 
-          style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1 }}
+          style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1, backgroundColor: '#f5f5f5' }}
         ></div>
-        {/* ============================== */}
 
         <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
           <h4 className="fw-bold m-0">
