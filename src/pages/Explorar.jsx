@@ -43,7 +43,29 @@ const atracoesDb = [
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
   const [filtroAtivo, setFiltroAtivo] = useState('all');
+  
+  // 1. CRIAMOS O ESTADO PARA O CARRINHO/FAVORITOS
+  const [favoritos, setFavoritos] = useState([]); 
+  
   const location = useLocation();
+
+  // 2. RECUPERAMOS OS FAVORITOS SALVOS NO NAVEGADOR AO ABRIR A PÁGINA
+  useEffect(() => {
+    const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
+    setFavoritos(favsSalvos);
+  }, []);
+
+  // 3. FUNÇÃO PARA ADICIONAR OU REMOVER DO CARRINHO/FAVORITOS
+  const toggleFav = (id) => {
+    let novosFavs;
+    if (favoritos.includes(id)) {
+      novosFavs = favoritos.filter((f) => f !== id); // Tira da lista
+    } else {
+      novosFavs = [...favoritos, id]; // Coloca na lista
+    }
+    setFavoritos(novosFavs);
+    localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -97,14 +119,41 @@ export default function Explorar() {
           {atracoes.map(attr => (
             <div className="col-lg-4 col-md-6" key={attr.id}>
               <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+                
+                {/* DIV DA IMAGEM: Adicionei position: relative para o coração flutuar aqui */}
+                <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                  
+                  {/* BOTÃO DE CORAÇÃO/CARRINHO VOLTOU AQUI */}
+                  <button 
+                    onClick={() => toggleFav(attr.id)}
+                    style={{
+                      position: 'absolute', top: '15px', right: '15px',
+                      background: 'rgba(255, 255, 255, 0.9)', border: 'none',
+                      width: '36px', height: '36px', borderRadius: '50%',
+                      color: favoritos.includes(attr.id) ? '#e63946' : '#ccc',
+                      transition: '0.3s', zIndex: 10
+                    }}
+                  >
+                    <i className="fas fa-heart"></i>
+                  </button>
+
+                </div>
+
                 <div className="card-body d-flex flex-column p-4">
                   <span className={`badge bg-light text-dark mb-2 align-self-start`}>{attr.tag}</span>
                   <h5 className="fw-bold">{attr.titulo}</h5>
                   <p className="text-muted small flex-grow-1">{attr.descricao}</p>
                   <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                     <span className="fw-bold text-success">{attr.preco}</span>
-                    <button className="btn btn-sm btn-outline-dark fw-bold">Ver Detalhes</button>
+                    
+                    {/* BOTÃO DE VER DETALHES AGORA COM A AÇÃO ONCLICK */}
+                    <button 
+                      className="btn btn-sm btn-outline-dark fw-bold"
+                      onClick={() => alert(`Você clicou para ver os detalhes de: ${attr.titulo}`)}
+                    >
+                      Ver Detalhes
+                    </button>
+
                   </div>
                 </div>
               </div>
