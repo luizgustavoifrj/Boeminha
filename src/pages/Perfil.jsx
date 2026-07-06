@@ -8,6 +8,12 @@ export default function Perfil() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [disponivel, setDisponivel] = useState(true); // Para guias
+
+  // Estados para o Modal de Avaliação
+  const [modalAvaliacao, setModalAvaliacao] = useState(null);
+  const [nota, setNota] = useState(5);
+  const [comentario, setComentario] = useState('');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,9 +46,15 @@ export default function Perfil() {
     navigate('/login');
   };
 
-  // Calcula dias restantes (Simulação para o projeto)
   const calcularDiasParaViagem = () => {
     return 12; // Número fixo para a apresentação
+  };
+
+  const enviarAvaliacao = () => {
+    alert(`Avaliação enviada com sucesso! Nota: ${nota} estrelas. Seu comentário ajuda a comunidade Boeminha.`);
+    setModalAvaliacao(null);
+    setNota(5);
+    setComentario('');
   };
 
   if (loading) {
@@ -52,7 +64,7 @@ export default function Perfil() {
   return (
     <div style={{ paddingTop: '76px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       
-      {/* Cabeçalho do Perfil (Comum a todos) */}
+      {/* Cabeçalho do Perfil */}
       <header className="bg-white border-bottom py-4 mb-4 shadow-sm">
         <div className="container d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
@@ -70,9 +82,7 @@ export default function Perfil() {
 
       <main className="container mb-5">
         
-        {/* ========================================== */}
-        {/* INTERFACE PARA TURISTAS                    */}
-        {/* ========================================== */}
+        {/* INTERFACE PARA TURISTAS */}
         {(!dadosDb?.tipo || dadosDb.tipo === 'turista') && (
           <div className="row g-4">
             <div className="col-lg-4">
@@ -102,19 +112,63 @@ export default function Perfil() {
                           <h6 className="fw-bold mb-1 text-dark">Pedido #{pedido.id.substring(0, 8)}</h6>
                           <small className="text-muted">Status: <span className="text-success fw-bold">{pedido.status}</span> | Total: R$ {pedido.total.toFixed(2)}</small>
                         </div>
-                        <button className="btn btn-sm btn-outline-secondary fw-bold rounded-pill">Avaliar Local</button>
+                        <button 
+                          className="btn btn-sm btn-outline-success fw-bold rounded-pill"
+                          onClick={() => setModalAvaliacao(pedido)}
+                        >
+                          <i className="fas fa-star me-1"></i> Avaliar Local
+                        </button>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
             </div>
+
+            {/* Modal de Avaliação */}
+            {modalAvaliacao && (
+              <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050 }} tabIndex="-1">
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content rounded-4 border-0">
+                    <div className="modal-header bg-dark text-white border-0 rounded-top-4">
+                      <h5 className="modal-title fw-bold">Avaliar Experiência</h5>
+                      <button type="button" className="btn-close btn-close-white" onClick={() => setModalAvaliacao(null)}></button>
+                    </div>
+                    <div className="modal-body p-4 text-center">
+                      <h6 className="fw-bold mb-3">Como foi o pedido #{modalAvaliacao.id.substring(0,8)}?</h6>
+                      
+                      <div className="d-flex justify-content-center gap-2 mb-4 fs-2 text-warning">
+                        {[1, 2, 3, 4, 5].map((estrela) => (
+                          <i 
+                            key={estrela} 
+                            className={`fa-star ${estrela <= nota ? 'fas' : 'far'}`} 
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setNota(estrela)}
+                          ></i>
+                        ))}
+                      </div>
+
+                      <textarea 
+                        className="form-control bg-light p-3 mb-3" 
+                        rows="3" 
+                        placeholder="Conte para outros exploradores o que você achou..."
+                        value={comentario}
+                        onChange={(e) => setComentario(e.target.value)}
+                        style={{ resize: 'none' }}
+                      ></textarea>
+
+                      <button className="btn btn-success fw-bold w-100 rounded-pill p-3" onClick={enviarAvaliacao}>
+                        <i className="fas fa-paper-plane me-2"></i> Publicar Avaliação
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* INTERFACE PARA GUIAS                       */}
-        {/* ========================================== */}
+        {/* INTERFACE PARA GUIAS */}
         {dadosDb?.tipo === 'guia' && (
           <div className="row g-4">
             <div className="col-lg-4">
@@ -142,9 +196,7 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* ========================================== */}
-        {/* INTERFACE PARA DONOS / BUSINESS            */}
-        {/* ========================================== */}
+        {/* INTERFACE PARA DONOS / BUSINESS */}
         {dadosDb?.tipo === 'dono' && (
           <div className="row g-4">
             <div className="col-lg-4">
