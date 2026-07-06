@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// BANCO DE DADOS ATUALIZADO COM COORDENADAS PARA O MAPA E CATEGORIA GASTRONOMIA
+// BANCO DE DADOS
 const atracoesDb = [
   // --- CULTURA ---
   {
@@ -202,12 +202,9 @@ export default function Explorar() {
   const [adicionadoFeedback, setAdicionadoFeedback] = useState(false);
   
   const location = useLocation();
-
-  // REFERÊNCIAS DO MAPA
   const mapRef = useRef(null);
   const markersLayerRef = useRef(null);
 
-  // CARREGA OS FAVORITOS DA MEMÓRIA
   useEffect(() => {
     const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
     setFavoritos(favsSalvos);
@@ -243,11 +240,12 @@ export default function Explorar() {
         qtd: 1
       });
     }
-
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // LÓGICA DO MAPA COM CORES BASEADAS NAS CATEGORIAS
+  // ======================================================================
+  // O SEGREDO ESTÁ AQUI: MAPA DEFINITIVO COM PINOS DE CORES DIFERENTES
+  // ======================================================================
   useEffect(() => {
     if (!mapRef.current) {
       mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
@@ -260,46 +258,36 @@ export default function Explorar() {
 
     markersLayerRef.current.clearLayers();
 
-    // ADICIONAMOS A COR DO PINO VIA FILTRO CSS (HUE-ROTATE)
+    // Função que escolhe o link exato da imagem do pino dependendo da categoria
+    const obterIconeColorido = (categoria, isFavoritoView) => {
+      let cor = 'blue'; // Padrão
+      
+      if (isFavoritoView) {
+        cor = 'violet'; // Se tiver na aba Favoritos, fica roxo
+      } else if (categoria === 'natureza') {
+        cor = 'green';   // Verde
+      } else if (categoria === 'boemia') {
+        cor = 'orange'; // Laranja
+      } else if (categoria === 'gastronomia') {
+        cor = 'red';    // Vermelho
+      }
+
+      return new L.Icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${cor}.png`,
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+    };
+
+    // Coloca os pinos no mapa usando a função acima
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
-        let filtroCss = '';
-
-        // Define a rotação de matriz de cor do pino azul baseado na categoria
-        if (filtroAtivo === 'favoritos') {
-          filtroCss = 'hue-rotate(110deg);'; // Roxo para Favoritos
-        } else if (attr.categoria === 'natureza') {
-          filtroCss = 'hue-rotate(220deg) brightness(0.9);'; // Verde para Natureza
-        } else if (attr.categoria === 'boemia') {
-          filtroCss = 'hue-rotate(320deg) saturate(1.5);'; // Laranja para Boemia
-        } else if (attr.categoria === 'gastronomia') {
-          filtroCss = 'hue-rotate(140deg) saturate(2);'; // Vermelho para Gastronomia
-        } else {
-          filtroCss = 'none;'; // Azul padrão para Cultura
-        }
-
-        // Criamos a imagem do ícone injetando a classe CSS que rotaciona a cor
-        const iconeColorido = new L.Icon({
-          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41],
-          className: `map-marker-icon-${attr.id}` // Geramos uma classe única
-        });
-
-        const marker = L.marker([attr.lat, attr.lng], { icon: iconeColorido }).bindPopup(`<b>${attr.titulo}</b>`);
+        const iconePronto = obterIconeColorido(attr.categoria, filtroAtivo === 'favoritos');
+        const marker = L.marker([attr.lat, attr.lng], { icon: iconePronto }).bindPopup(`<b>${attr.titulo}</b>`);
         markersLayerRef.current.addLayer(marker);
-
-        // Aguarda meio segundo para o pino carregar no HTML e aplica o filtro de cor nele
-        setTimeout(() => {
-          const elementoImg = document.querySelector(`.map-marker-icon-${attr.id}`);
-          if (elementoImg) {
-            elementoImg.style.filter = filtroCss;
-          }
-        }, 100);
       }
     });
 
@@ -308,8 +296,8 @@ export default function Explorar() {
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
   }, [atracoes, filtroAtivo]); 
+  // ======================================================================
 
-  // BUSCA PELA BARRA DE PESQUISA DA HOME
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const termoBuscado = params.get("busca");
