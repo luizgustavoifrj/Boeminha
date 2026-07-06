@@ -7,6 +7,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [metodoPagamento, setMetodoPagamento] = useState('cartao'); // 'cartao' ou 'pix'
   const [pixCopiado, setPixCopiado] = useState(false);
+  const [dataAgendada, setDataAgendada] = useState(''); // Estado para guardar a data escolhida
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,18 +40,25 @@ export default function Checkout() {
 
   const processarPagamento = async (e) => {
     e.preventDefault();
+    
+    if (!dataAgendada) {
+      alert("Por favor, selecione a data do seu passeio antes de prosseguir.");
+      return;
+    }
+
     setLoading(true);
     
     const user = auth.currentUser;
     if (!user) return;
 
     try {
-      // Salva o pedido no Firestore com o método de pagamento
+      // Salva o pedido no Firestore com a data agendada
       await firestore.collection("usuarios").doc(user.uid).collection("pedidos").add({
         itens: cartItems,
         total: calcularTotal(),
         metodo: metodoPagamento,
         dataCompra: new Date().toISOString(),
+        dataAgendada: dataAgendada, // Campo que o Perfil usa para "Próximos Eventos"
         status: "Aprovado",
       });
 
@@ -58,7 +66,7 @@ export default function Checkout() {
       localStorage.removeItem("boeminha_cart");
       
       setTimeout(() => {
-        alert("Pagamento aprovado! Você já pode ver sua compra no seu perfil.");
+        alert("Pagamento aprovado! O ingresso já está na aba de Próximos Eventos no seu perfil.");
         navigate('/perfil');
       }, 2000);
 
@@ -75,16 +83,33 @@ export default function Checkout() {
     setTimeout(() => setPixCopiado(false), 3000);
   };
 
+  // Pega a data de hoje para impedir que o usuário agende para o passado
+  const hoje = new Date().toISOString().split('T')[0];
+
   return (
     <div style={{ paddingTop: '76px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="container mt-5 mb-5">
         <h2 className="fw-bold mb-4 text-dark"><i className="fas fa-lock text-success me-2"></i> Checkout Seguro</h2>
         
         <div className="row g-4">
-          {/* Coluna Esquerda: Formulário de Pagamento */}
+          {/* Coluna Esquerda: Formulário de Pagamento e Data */}
           <div className="col-lg-7">
             <div className="bg-white rounded-4 shadow-sm border p-4 p-md-5">
               
+              {/* Escolha da Data */}
+              <div className="mb-5 pb-4 border-bottom">
+                <h5 className="fw-bold mb-3"><i className="far fa-calendar-alt text-success me-2"></i>Quando será o seu passeio?</h5>
+                <label className="form-label small fw-bold text-muted">Selecione o dia na agenda</label>
+                <input 
+                  type="date" 
+                  className="form-control bg-light p-3 fs-5" 
+                  min={hoje} 
+                  required 
+                  value={dataAgendada}
+                  onChange={(e) => setDataAgendada(e.target.value)}
+                />
+              </div>
+
               <h5 className="fw-bold mb-4">Escolha a forma de pagamento</h5>
               
               {/* Abas de Seleção de Pagamento */}
@@ -146,7 +171,7 @@ export default function Checkout() {
                   </div>
                 )}
 
-                {/* Botão de Finalizar Comum */}
+                {/* Botão de Finalizar */}
                 <button type="submit" className="btn btn-success fw-bold w-100 p-3 rounded-pill shadow-sm mt-2" disabled={loading}>
                   {loading ? (
                     <><i className="fas fa-spinner fa-spin me-2"></i> PROCESSANDO...</>
