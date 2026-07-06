@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
+// BANCO DE DADOS ATUALIZADO COM OS NOVOS LOCAIS
 const atracoesDb = [
+  // --- CULTURA ---
   {
     id: "mac",
     titulo: "MAC Niterói",
@@ -12,36 +14,160 @@ const atracoesDb = [
     imagem: "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
   },
   {
+    id: "correios",
+    titulo: "Espaço Cultural Correios",
+    categoria: "cultura",
+    tag: "Arte & História",
+    descricao: "Exposições rotativas e grandes eventos culturais no coração da cidade.",
+    preco: "Gratuito",
+    imagem: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?q=80&w=800",
+  },
+  {
+    id: "abrigo-bondes",
+    titulo: "Centro Cultural Abrigo de Bondes",
+    categoria: "cultura",
+    tag: "História Local",
+    descricao: "Programação cultural riquíssima que preserva a arquitetura histórica.",
+    preco: "Gratuito",
+    imagem: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=800",
+  },
+  {
+    id: "quintal-cultural",
+    titulo: "Quintal Centro Cultural",
+    categoria: "cultura",
+    tag: "Cultura Independente",
+    descricao: "O point para oficinas, música boa e eventos da cena independente.",
+    preco: "A partir de R$ 15",
+    imagem: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800",
+  },
+
+  // --- NATUREZA ---
+  {
     id: "costao",
     titulo: "Costão de Itacoatiara",
     categoria: "natureza",
     tag: "Trilha & Mirante",
-    descricao: "Trilha clássica com visual do Oceano Atlântico.",
+    descricao: "Trilha clássica com visual panorâmico do Oceano Atlântico.",
     preco: "Gratuito",
     imagem: "https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg",
-  },
-  {
-    id: "cantareira",
-    titulo: "Samba da Cantareira",
-    categoria: "boemia",
-    tag: "Música & Bar",
-    descricao: "O polo cultural ferve com samba de raiz e cerveja.",
-    preco: "A partir de R$ 10",
-    imagem: "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
   },
   {
     id: "parque-cidade",
     titulo: "Parque da Cidade",
     categoria: "natureza",
     tag: "Pôr do Sol",
-    descricao: "O mirante perfeito para ver o sol se pôr.",
+    descricao: "O mirante perfeito para ver o sol se pôr e saltar de parapente.",
     preco: "Gratuito",
     imagem: "https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg",
+  },
+  {
+    id: "mirante-piratininga",
+    titulo: "Mirante Praia de Piratininga",
+    categoria: "natureza",
+    tag: "Vista Panorâmica",
+    descricao: "Um cenário incrível, ótimo para curtir o fim de tarde e tirar fotos.",
+    preco: "Gratuito",
+    imagem: "https://images.unsplash.com/photo-1444464666168-49b626d49cb4?q=80&w=800",
+  },
+  {
+    id: "mirante-juliana",
+    titulo: "Mirante Juliana Marins",
+    categoria: "natureza",
+    tag: "Mirante & Fotografia",
+    descricao: "Vista deslumbrante que rende passeios inesquecíveis e fotos perfeitas.",
+    preco: "Gratuito",
+    imagem: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800",
+  },
+
+  // --- BOEMIA ---
+  {
+    id: "cantareira",
+    titulo: "Espaço Cultural Estação Cantareira",
+    categoria: "boemia",
+    tag: "Polo Noturno",
+    descricao: "O principal polo de bares e vida noturna, conhecido como a Lapa de Niterói.",
+    preco: "Variado",
+    imagem: "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
+  },
+  {
+    id: "toca-gamba",
+    titulo: "Toca da Gamba",
+    categoria: "boemia",
+    tag: "Samba & Tradição",
+    descricao: "Roda de samba ao vivo com aquele clima boêmio que não tem igual.",
+    preco: "A partir de R$ 30",
+    imagem: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=800",
+  },
+  {
+    id: "boteco-confraria",
+    titulo: "Boteco Confraria",
+    categoria: "boemia",
+    tag: "Boteco Clássico",
+    descricao: "Um dos bares mais conhecidos de Icaraí. Chopp gelado e muita resenha.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?q=80&w=800",
+  },
+  {
+    id: "portista-bar",
+    titulo: "Portista Bar",
+    categoria: "boemia",
+    tag: "Petiscos & Cerveja",
+    descricao: "Bem tradicional! A melhor pedida para petiscos de qualidade e cerveja.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1538488251391-0e7fa3eb5562?q=80&w=800",
+  },
+  {
+    id: "center-bar",
+    titulo: "Center Bar",
+    categoria: "boemia",
+    tag: "Música ao Vivo",
+    descricao: "Público variado, ambiente descontraído e sempre com música ao vivo.",
+    preco: "A partir de R$ 15",
+    imagem: "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?q=80&w=800",
+  },
+
+  // --- GASTRONOMIA (Nova Categoria para os Cafés) ---
+  {
+    id: "lilia-cafe",
+    titulo: "Lilia Café",
+    categoria: "gastronomia",
+    tag: "Café & Encontros",
+    descricao: "Cafeteria intimista e charmosa, o local perfeito para bons encontros.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800",
+  },
+  {
+    id: "cassia-brunch",
+    titulo: "Cassia Confeitaria",
+    categoria: "gastronomia",
+    tag: "Brunch & Doces",
+    descricao: "Especializada em brunch e cafés especiais com doces inesquecíveis.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1495474472204-51ea99282214?q=80&w=800",
+  },
+  {
+    id: "matutino-cafe",
+    titulo: "Matutino Café",
+    categoria: "gastronomia",
+    tag: "Café & Trabalho",
+    descricao: "Ambiente moderno e tranquilo, excelente para tomar um café e fazer networking.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800",
+  },
+  {
+    id: "da-vinci-cafe",
+    titulo: "Da Vinci's Gourmet",
+    categoria: "gastronomia",
+    tag: "Café Gourmet",
+    descricao: "Ótima opção para degustar um café super bem preparado em um local aconchegante.",
+    preco: "Variado",
+    imagem: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?q=80&w=800",
   }
 ];
 
 const formatarPrecoParaNumero = (precoStr) => {
   if (precoStr.toLowerCase().includes('gratuito')) return 0;
+  if (precoStr.toLowerCase().includes('variado')) return 0; 
   const numeros = precoStr.match(/[\d,]+/);
   if (numeros) {
     return parseFloat(numeros[0].replace(',', '.')); 
@@ -73,7 +199,6 @@ export default function Explorar() {
     setFavoritos(novosFavs);
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
 
-    // Se estivermos na aba de favoritos e o usuário descurtir, remove da tela na hora!
     if (filtroAtivo === 'favoritos') {
       setAtracoes(atracoesDb.filter(a => novosFavs.includes(a.id)));
     }
@@ -115,7 +240,6 @@ export default function Explorar() {
     }
   }, [location.search]);
 
-  // A LÓGICA DE FILTRO AGORA SABE LER A ABA "FAVORITOS"
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
     if (categoria === 'all') {
@@ -148,9 +272,12 @@ export default function Explorar() {
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'all' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('all')}>Todos os Locais</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'natureza' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('natureza')}><i className="fas fa-tree me-1"></i> Natureza</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'boemia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('boemia')}><i className="fas fa-beer me-1"></i> Boemia</button>
+          
+          {/* O NOVO BOTÃO DE GASTRONOMIA AQUI */}
+          <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'gastronomia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('gastronomia')}><i className="fas fa-coffee me-1"></i> Gastronomia</button>
+          
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'cultura' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('cultura')}><i className="fas fa-palette me-1"></i> Cultura</button>
           
-          {/* BOTÃO DE MEUS FAVORITOS (Jogado para a direita com ms-auto e com as cores rubro-negras) */}
           <button 
             className={`btn rounded-pill fw-bold ms-lg-auto ${filtroAtivo === 'favoritos' ? 'btn-danger' : 'btn-outline-danger'}`} 
             onClick={() => filtrar('favoritos')}
@@ -270,7 +397,6 @@ export default function Explorar() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
