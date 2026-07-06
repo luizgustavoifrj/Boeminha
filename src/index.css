@@ -1,0 +1,14 @@
+/* Paleta Modo Escuro "Deep Forest" */
+body.dark-theme {
+  --primary: #52b788;
+  --primary-dark: #18755c;
+  --accent: #e9c46a;
+  --text-dark: #e0e0e0;
+  --bg-light: #0b1411;
+  --white: #162620;
+  --border-color: #243630;
+}
+
+body {
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
