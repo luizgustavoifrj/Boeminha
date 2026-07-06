@@ -102,7 +102,7 @@ export default function Home() {
             <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-star me-1"></i> RECOMENDADO</span>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
               <p className="small mb-1 text-uppercase text-light opacity-75 fw-bold">Vida Noturna</p>
-              <h3 className="fw-bold mb-0">Samba da Cantareira: Ingressos Abertos</h3>
+              <h3 className="fw-bold mb-0">Samba da cantareira: Ingressos Abertos</h3>
             </div>
           </a>
           
