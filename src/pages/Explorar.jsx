@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// BANCO DE DADOS
 const atracoesDb = [
   // --- CULTURA ---
   {
@@ -244,7 +243,7 @@ export default function Explorar() {
   };
 
   // ======================================================================
-  // O SEGREDO ESTÁ AQUI: MAPA DEFINITIVO COM PINOS DE CORES DIFERENTES
+  // MAPA DEFINITIVO: PINOS DESENHADOS COM CSS E ÍCONES DO FONTAWESOME!
   // ======================================================================
   useEffect(() => {
     if (!mapRef.current) {
@@ -258,34 +257,55 @@ export default function Explorar() {
 
     markersLayerRef.current.clearLayers();
 
-    // Função que escolhe o link exato da imagem do pino dependendo da categoria
-    const obterIconeColorido = (categoria, isFavoritoView) => {
-      let cor = 'blue'; // Padrão
+    // A MÁGICA: CRIAMOS O PINO ESCREVENDO HTML PURO!
+    const obterPinoModerno = (categoria, isFavoritoView) => {
+      let cor = '#0077b6'; // Azul Padrão (Cultura)
+      let icone = 'fa-palette'; // Ícone de paleta de pintura
       
       if (isFavoritoView) {
-        cor = 'violet'; // Se tiver na aba Favoritos, fica roxo
+        cor = '#9b59b6'; // Roxo (Favoritos)
+        icone = 'fa-heart';
       } else if (categoria === 'natureza') {
-        cor = 'green';   // Verde
+        cor = '#2d6a4f'; // Verde
+        icone = 'fa-tree';
       } else if (categoria === 'boemia') {
-        cor = 'orange'; // Laranja
+        cor = '#d68c45'; // Laranja/Dourado
+        icone = 'fa-beer';
       } else if (categoria === 'gastronomia') {
-        cor = 'red';    // Vermelho
+        cor = '#e63946'; // Vermelho
+        icone = 'fa-coffee';
       }
 
-      return new L.Icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${cor}.png`,
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
+      // Desenhamos um pino arredondado parecido com o do Google Maps
+      const pinoHTML = `
+        <div style="
+          background-color: ${cor};
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50% 50% 50% 0;
+          transform: rotate(-45deg);
+          border: 2px solid white;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        ">
+          <i class="fas ${icone}" style="color: white; transform: rotate(45deg); font-size: 14px;"></i>
+        </div>
+      `;
+
+      return L.divIcon({
+        className: 'custom-pin', // Ignora qualquer classe padrão azul
+        html: pinoHTML,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], // Faz a "ponta" do pino apontar exatamente para o local
+        popupAnchor: [0, -32] // Faz o balãozinho abrir em cima do pino
       });
     };
 
-    // Coloca os pinos no mapa usando a função acima
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
-        const iconePronto = obterIconeColorido(attr.categoria, filtroAtivo === 'favoritos');
+        const iconePronto = obterPinoModerno(attr.categoria, filtroAtivo === 'favoritos');
         const marker = L.marker([attr.lat, attr.lng], { icon: iconePronto }).bindPopup(`<b>${attr.titulo}</b>`);
         markersLayerRef.current.addLayer(marker);
       }
@@ -343,7 +363,7 @@ export default function Explorar() {
         </h4>
         <div 
           id="map-container" 
-          style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1 }}
+          style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1, backgroundColor: '#f0f0f0' }}
         ></div>
 
         <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
