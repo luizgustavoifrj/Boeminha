@@ -40,13 +40,11 @@ const atracoesDb = [
   }
 ];
 
-// FUNÇÃO PARA TRADUZIR O PREÇO DE TEXTO PARA NÚMERO MATEMÁTICO (ex: "R$ 25,00" vira 25.00)
 const formatarPrecoParaNumero = (precoStr) => {
   if (precoStr.toLowerCase().includes('gratuito')) return 0;
-  // Extrai só os números e a vírgula (Ex: "A partir de R$ 10,50" vira "10,50")
   const numeros = precoStr.match(/[\d,]+/);
   if (numeros) {
-    return parseFloat(numeros[0].replace(',', '.')); // Troca vírgula por ponto para a matemática funcionar
+    return parseFloat(numeros[0].replace(',', '.')); 
   }
   return 0;
 };
@@ -54,12 +52,11 @@ const formatarPrecoParaNumero = (precoStr) => {
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
   const [filtroAtivo, setFiltroAtivo] = useState('all');
-  
-  // Favoritos continua existindo apenas para o "Coraçãozinho"
   const [favoritos, setFavoritos] = useState([]); 
-  
-  // Estado para controlar a Janela (Modal)
   const [localSelecionado, setLocalSelecionado] = useState(null);
+  
+  // NOVO: Estado para controlar a animação do botão de carrinho
+  const [adicionadoFeedback, setAdicionadoFeedback] = useState(false);
   
   const location = useLocation();
 
@@ -79,18 +76,13 @@ export default function Explorar() {
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
   };
 
-  // LÓGICA OFICIAL PARA MANDAR PRO CARRINHO DE COMPRAS
   const adicionarAoCarrinho = (local) => {
-    // 1. Puxa o carrinho que já existe (ou cria um novo se estiver vazio)
     const cartSalvo = JSON.parse(localStorage.getItem('boeminha_cart')) || [];
-    
-    // 2. Verifica se a atração já está no carrinho
     const itemExistente = cartSalvo.find(item => item.id === local.id);
 
     if (itemExistente) {
-      itemExistente.qtd += 1; // Se já tem, só aumenta a quantidade
+      itemExistente.qtd += 1; 
     } else {
-      // Se não tem, coloca o item formatado do jeitinho que o seu arquivo Cart.jsx gosta
       cartSalvo.push({
         id: local.id,
         titulo: local.titulo,
@@ -100,10 +92,8 @@ export default function Explorar() {
       });
     }
 
-    // 3. Salva no navegador e fecha a janela para o usuário continuar navegando
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
-    alert(`${local.titulo} adicionado ao carrinho!`); // Feedback rápido
-    setLocalSelecionado(null); // Fecha a janela do modal
+    // Tirei o alert daqui!
   };
 
   useEffect(() => {
@@ -159,8 +149,6 @@ export default function Explorar() {
             <div className="col-lg-4 col-md-6" key={attr.id}>
               <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                 <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
-                  
-                  {/* BOTÃO DE FAVORITAR CONTINUA FUNCIONANDO NORMAL */}
                   <button 
                     onClick={() => toggleFav(attr.id)}
                     style={{
@@ -183,7 +171,10 @@ export default function Explorar() {
                     
                     <button 
                       className="btn btn-sm btn-outline-dark fw-bold"
-                      onClick={() => setLocalSelecionado(attr)}
+                      onClick={() => {
+                        setLocalSelecionado(attr);
+                        setAdicionadoFeedback(false); // Reseta o visual do botão ao abrir um novo
+                      }}
                     >
                       Ver Detalhes
                     </button>
@@ -233,13 +224,24 @@ export default function Explorar() {
               <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2 pt-4 border-top">
                 <h4 className="fw-bold text-success m-0 mb-3 mb-sm-0">{localSelecionado.preco}</h4>
                 
-                {/* BOTÃO DO CARRINHO DE COMPRAS CONECTADO COM SUCESSO! */}
+                {/* BOTÃO SEM ALERT COM FEEDBACK VISUAL */}
                 <button 
-                  className="btn btn-success px-4 py-2 fw-bold rounded-pill"
-                  onClick={() => adicionarAoCarrinho(localSelecionado)}
+                  className={`btn px-4 py-2 fw-bold rounded-pill ${adicionadoFeedback ? 'btn-dark' : 'btn-success'}`}
+                  disabled={adicionadoFeedback}
+                  onClick={() => {
+                    adicionarAoCarrinho(localSelecionado);
+                    setAdicionadoFeedback(true); // Muda o botão para "Adicionado!"
+                    
+                    // Fecha a janela sozinho depois de 1.2 segundos
+                    setTimeout(() => {
+                      setLocalSelecionado(null);
+                      setAdicionadoFeedback(false);
+                    }, 1200);
+                  }}
+                  style={{ transition: '0.3s ease' }}
                 >
-                  <i className="fas fa-cart-plus me-2"></i>
-                  Adicionar ao Carrinho
+                  <i className={`fas ${adicionadoFeedback ? 'fa-check' : 'fa-cart-plus'} me-2`}></i>
+                  {adicionadoFeedback ? 'Adicionado!' : 'Adicionar ao Carrinho'}
                 </button>
               </div>
             </div>
