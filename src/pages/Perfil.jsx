@@ -21,18 +21,29 @@ export default function Perfil() {
       if (currentUser) {
         setUser(currentUser);
         
-        // Busca qual é o tipo de usuário no Firestore
-        const doc = await firestore.collection('usuarios').doc(currentUser.uid).get();
-        if (doc.exists) {
-          setDadosDb(doc.data());
-        }
+        try {
+          // Tenta buscar qual é o tipo de usuário no Firestore
+          const doc = await firestore.collection('usuarios').doc(currentUser.uid).get();
+          if (doc.exists) {
+            setDadosDb(doc.data());
+          } else {
+            // Se não existir no banco, cria um perfil provisório na tela
+            setDadosDb({ nome: currentUser.email.split('@')[0], tipo: 'turista' });
+          }
 
-        // Busca o histórico de compras/pedidos
-        const pedidosSnapshot = await firestore.collection('usuarios').doc(currentUser.uid).collection('pedidos').orderBy('dataCompra', 'desc').get();
-        const listaPedidos = pedidosSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        setPedidos(listaPedidos);
+          // Tenta buscar o histórico de compras/pedidos
+          const pedidosSnapshot = await firestore.collection('usuarios').doc(currentUser.uid).collection('pedidos').get();
+          const listaPedidos = pedidosSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          setPedidos(listaPedidos);
+          
+        } catch (dbError) {
+          console.error("Erro ao ler banco de dados:", dbError);
+          setDadosDb({ nome: currentUser.email.split('@')[0], tipo: 'turista' });
+        } finally {
+          // Independente de dar erro ou sucesso, tira a tela de carregamento!
+          setLoading(false);
+        }
         
-        setLoading(false);
       } else {
         navigate('/login');
       }
