@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-// BANCO DE DADOS ATUALIZADO COM OS NOVOS LOCAIS
+// BANCO DE DADOS ATUALIZADO COM COORDENADAS PARA O MAPA
 const atracoesDb = [
   // --- CULTURA ---
   {
@@ -12,6 +14,7 @@ const atracoesDb = [
     descricao: "A obra-prima de Niemeyer com vista deslumbrante.",
     preco: "R$ 25,00",
     imagem: "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
+    lat: -22.9068, lng: -43.1244
   },
   {
     id: "correios",
@@ -21,6 +24,7 @@ const atracoesDb = [
     descricao: "Exposições rotativas e grandes eventos culturais no coração da cidade.",
     preco: "Gratuito",
     imagem: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?q=80&w=800",
+    lat: -22.8945, lng: -43.1220
   },
   {
     id: "abrigo-bondes",
@@ -30,6 +34,7 @@ const atracoesDb = [
     descricao: "Programação cultural riquíssima que preserva a arquitetura histórica.",
     preco: "Gratuito",
     imagem: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=800",
+    lat: -22.8950, lng: -43.1210
   },
   {
     id: "quintal-cultural",
@@ -39,6 +44,7 @@ const atracoesDb = [
     descricao: "O point para oficinas, música boa e eventos da cena independente.",
     preco: "A partir de R$ 15",
     imagem: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800",
+    lat: -22.9000, lng: -43.1150
   },
 
   // --- NATUREZA ---
@@ -50,6 +56,7 @@ const atracoesDb = [
     descricao: "Trilha clássica com visual panorâmico do Oceano Atlântico.",
     preco: "Gratuito",
     imagem: "https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg",
+    lat: -22.9760, lng: -43.0275
   },
   {
     id: "parque-cidade",
@@ -59,6 +66,7 @@ const atracoesDb = [
     descricao: "O mirante perfeito para ver o sol se pôr e saltar de parapente.",
     preco: "Gratuito",
     imagem: "https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg",
+    lat: -22.9158, lng: -43.0858
   },
   {
     id: "mirante-piratininga",
@@ -68,6 +76,7 @@ const atracoesDb = [
     descricao: "Um cenário incrível, ótimo para curtir o fim de tarde e tirar fotos.",
     preco: "Gratuito",
     imagem: "https://images.unsplash.com/photo-1444464666168-49b626d49cb4?q=80&w=800",
+    lat: -22.9600, lng: -43.0600
   },
   {
     id: "mirante-juliana",
@@ -77,6 +86,7 @@ const atracoesDb = [
     descricao: "Vista deslumbrante que rende passeios inesquecíveis e fotos perfeitas.",
     preco: "Gratuito",
     imagem: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800",
+    lat: -22.9250, lng: -43.0900
   },
 
   // --- BOEMIA ---
@@ -88,6 +98,7 @@ const atracoesDb = [
     descricao: "O principal polo de bares e vida noturna, conhecido como a Lapa de Niterói.",
     preco: "Variado",
     imagem: "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
+    lat: -22.9015, lng: -43.1320
   },
   {
     id: "toca-gamba",
@@ -97,6 +108,7 @@ const atracoesDb = [
     descricao: "Roda de samba ao vivo com aquele clima boêmio que não tem igual.",
     preco: "A partir de R$ 30",
     imagem: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=800",
+    lat: -22.8879, lng: -43.1235
   },
   {
     id: "boteco-confraria",
@@ -106,6 +118,7 @@ const atracoesDb = [
     descricao: "Um dos bares mais conhecidos de Icaraí. Chopp gelado e muita resenha.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?q=80&w=800",
+    lat: -22.9060, lng: -43.1090
   },
   {
     id: "portista-bar",
@@ -115,6 +128,7 @@ const atracoesDb = [
     descricao: "Bem tradicional! A melhor pedida para petiscos de qualidade e cerveja.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1538488251391-0e7fa3eb5562?q=80&w=800",
+    lat: -22.9015, lng: -43.1080
   },
   {
     id: "center-bar",
@@ -124,9 +138,10 @@ const atracoesDb = [
     descricao: "Público variado, ambiente descontraído e sempre com música ao vivo.",
     preco: "A partir de R$ 15",
     imagem: "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?q=80&w=800",
+    lat: -22.9100, lng: -43.1050
   },
 
-  // --- GASTRONOMIA (Nova Categoria para os Cafés) ---
+  // --- GASTRONOMIA ---
   {
     id: "lilia-cafe",
     titulo: "Lilia Café",
@@ -135,6 +150,7 @@ const atracoesDb = [
     descricao: "Cafeteria intimista e charmosa, o local perfeito para bons encontros.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800",
+    lat: -22.9030, lng: -43.1100
   },
   {
     id: "cassia-brunch",
@@ -144,6 +160,7 @@ const atracoesDb = [
     descricao: "Especializada em brunch e cafés especiais com doces inesquecíveis.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1495474472204-51ea99282214?q=80&w=800",
+    lat: -22.9110, lng: -43.1070
   },
   {
     id: "matutino-cafe",
@@ -153,6 +170,7 @@ const atracoesDb = [
     descricao: "Ambiente moderno e tranquilo, excelente para tomar um café e fazer networking.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800",
+    lat: -22.9075, lng: -43.1055
   },
   {
     id: "da-vinci-cafe",
@@ -162,12 +180,13 @@ const atracoesDb = [
     descricao: "Ótima opção para degustar um café super bem preparado em um local aconchegante.",
     preco: "Variado",
     imagem: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?q=80&w=800",
+    lat: -22.9020, lng: -43.1110
   }
 ];
 
 const formatarPrecoParaNumero = (precoStr) => {
   if (precoStr.toLowerCase().includes('gratuito')) return 0;
-  if (precoStr.toLowerCase().includes('variado')) return 0; 
+  if (precoStr.toLowerCase().includes('variado')) return 0;
   const numeros = precoStr.match(/[\d,]+/);
   if (numeros) {
     return parseFloat(numeros[0].replace(',', '.')); 
@@ -184,6 +203,11 @@ export default function Explorar() {
   
   const location = useLocation();
 
+  // REFERÊNCIAS DO MAPA
+  const mapRef = useRef(null);
+  const markersLayerRef = useRef(null);
+
+  // CARREGA OS FAVORITOS DA MEMÓRIA
   useEffect(() => {
     const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
     setFavoritos(favsSalvos);
@@ -223,6 +247,7 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
+  // BUSCA PELA BARRA DE PESQUISA DA HOME
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const termoBuscado = params.get("busca");
@@ -239,6 +264,36 @@ export default function Explorar() {
       setAtracoes(atracoesDb);
     }
   }, [location.search]);
+
+  // LÓGICA PARA ATUALIZAR O MAPA SEMPRE QUE A LISTA MUDAR
+  useEffect(() => {
+    if (!mapRef.current) {
+      // Inicia o mapa na primeira vez
+      mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(mapRef.current);
+      
+      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    }
+
+    // Limpa os pontos antigos
+    markersLayerRef.current.clearLayers();
+
+    // Adiciona os pontos novos baseados na lista atual filtrada
+    atracoes.forEach((attr) => {
+      if (attr.lat && attr.lng) {
+        const marker = L.marker([attr.lat, attr.lng]).bindPopup(`<b>${attr.titulo}</b>`);
+        markersLayerRef.current.addLayer(marker);
+      }
+    });
+
+    // Centraliza o mapa dando zoom para mostrar todos os locais da tela
+    const bounds = atracoes.filter(a => a.lat && a.lng).map((a) => [a.lat, a.lng]);
+    if (bounds.length > 0) {
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [atracoes]); // Toda vez que a variável 'atracoes' mudar, o mapa atualiza!
 
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
@@ -261,7 +316,19 @@ export default function Explorar() {
       </section>
 
       <main className="container mb-5 mt-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        
+        {/* === MAPA REINTEGRADO AQUI === */}
+        <h4 className="fw-bold mb-3">
+          <i className="fas fa-map-marked-alt me-2 text-success"></i>
+          Visão Geral
+        </h4>
+        <div 
+          id="map-container" 
+          style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1 }}
+        ></div>
+        {/* ============================== */}
+
+        <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
           <h4 className="fw-bold m-0">
             {filtroAtivo === 'favoritos' ? 'Sua Lista de Desejos' : 'Catálogo Completo'}
           </h4>
@@ -272,10 +339,7 @@ export default function Explorar() {
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'all' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('all')}>Todos os Locais</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'natureza' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('natureza')}><i className="fas fa-tree me-1"></i> Natureza</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'boemia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('boemia')}><i className="fas fa-beer me-1"></i> Boemia</button>
-          
-          {/* O NOVO BOTÃO DE GASTRONOMIA AQUI */}
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'gastronomia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('gastronomia')}><i className="fas fa-coffee me-1"></i> Gastronomia</button>
-          
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'cultura' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('cultura')}><i className="fas fa-palette me-1"></i> Cultura</button>
           
           <button 
