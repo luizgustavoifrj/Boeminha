@@ -3,22 +3,7 @@ import { useLocation } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// === COLE ESTE BLOCO AQUI PARA CONSERTAR O PINO DO MAPA ===
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-});
-// ==========================================================
-
-// ... resto do seu código
-// BANCO DE DADOS ATUALIZADO COM COORDENADAS PARA O MAPA
+// BANCO DE DADOS ATUALIZADO COM COORDENADAS PARA O MAPA E CATEGORIA GASTRONOMIA
 const atracoesDb = [
   // --- CULTURA ---
   {
@@ -262,6 +247,47 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
+  // LÓGICA PARA ATUALIZAR O MAPA SEMPRE QUE A LISTA MUDAR (AQUI ESTÁ O CONSERTO DOS PINOS!)
+  useEffect(() => {
+    if (!mapRef.current) {
+      // Inicia o mapa na primeira vez
+      mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+      }).addTo(mapRef.current);
+      
+      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
+    }
+
+    // Limpa os pontos antigos
+    markersLayerRef.current.clearLayers();
+
+    // CRIANDO O ÍCONE MANUALMENTE (À prova de falhas no React!)
+    const pinoPersonalizado = new L.Icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+
+    // Adiciona os pontos novos baseados na lista atual filtrada usando o ícone consertado
+    atracoes.forEach((attr) => {
+      if (attr.lat && attr.lng) {
+        const marker = L.marker([attr.lat, attr.lng], { icon: pinoPersonalizado }).bindPopup(`<b>${attr.titulo}</b>`);
+        markersLayerRef.current.addLayer(marker);
+      }
+    });
+
+    // Centraliza o mapa dando zoom para mostrar todos os locais da tela
+    const bounds = atracoes.filter(a => a.lat && a.lng).map((a) => [a.lat, a.lng]);
+    if (bounds.length > 0) {
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [atracoes]); 
+
   // BUSCA PELA BARRA DE PESQUISA DA HOME
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -279,36 +305,6 @@ export default function Explorar() {
       setAtracoes(atracoesDb);
     }
   }, [location.search]);
-
-  // LÓGICA PARA ATUALIZAR O MAPA SEMPRE QUE A LISTA MUDAR
-  useEffect(() => {
-    if (!mapRef.current) {
-      // Inicia o mapa na primeira vez
-      mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-      }).addTo(mapRef.current);
-      
-      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
-    }
-
-    // Limpa os pontos antigos
-    markersLayerRef.current.clearLayers();
-
-    // Adiciona os pontos novos baseados na lista atual filtrada
-    atracoes.forEach((attr) => {
-      if (attr.lat && attr.lng) {
-        const marker = L.marker([attr.lat, attr.lng]).bindPopup(`<b>${attr.titulo}</b>`);
-        markersLayerRef.current.addLayer(marker);
-      }
-    });
-
-    // Centraliza o mapa dando zoom para mostrar todos os locais da tela
-    const bounds = atracoes.filter(a => a.lat && a.lng).map((a) => [a.lat, a.lng]);
-    if (bounds.length > 0) {
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [atracoes]); // Toda vez que a variável 'atracoes' mudar, o mapa atualiza!
 
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
