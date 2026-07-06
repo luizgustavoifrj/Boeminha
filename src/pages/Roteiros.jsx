@@ -1,66 +1,109 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 export default function Roteiros() {
+  const navigate = useNavigate();
+
+  // Banco de dados simulado específico para os Roteiros com Guias
+  const roteirosDb = [
+    {
+      id: "rot-1",
+      titulo: "Trilha Escondida do Tupinambá",
+      descricao: "Descubra mirantes secretos na Mata Atlântica que apenas os locais conhecem. Nível moderado, ideal para aventureiros.",
+      duracao: "4 horas",
+      preco: 45.00,
+      imagem: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Parque_da_Cidade_em_Niter%C3%B3i.jpg/1200px-Parque_da_Cidade_em_Niter%C3%B3i.jpg",
+      guia: { nome: "Aline Silva", foto: "https://randomuser.me/api/portraits/women/32.jpg", avaliacao: 4.9, especialidade: "Ecoturismo" }
+    },
+    {
+      id: "rot-2",
+      titulo: "Circuito Niemeyer Noturno",
+      descricao: "Passeio arquitetônico pelas obras de Oscar Niemeyer à noite, com paradas estratégicas para fotos e muita história.",
+      duracao: "3 horas",
+      preco: 60.00,
+      imagem: "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
+      guia: { nome: "Carlos Eduardo", foto: "https://randomuser.me/api/portraits/men/22.jpg", avaliacao: 4.8, especialidade: "Cultura & História" }
+    },
+    {
+      id: "rot-3",
+      titulo: "Tour Gastronômico da Cantareira",
+      descricao: "Mergulho cultural com degustação em 3 botecos clássicos da praça. O valor já inclui 3 chopes artesanais e petiscos.",
+      duracao: "4 horas",
+      preco: 120.00,
+      imagem: "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
+      guia: { nome: "Pedro Rocha", foto: "https://randomuser.me/api/portraits/men/45.jpg", avaliacao: 5.0, especialidade: "Boemia & Gastronomia" }
+    }
+  ];
+
+  const adicionarAoCarrinho = (roteiro) => {
+    const cart = JSON.parse(localStorage.getItem("boeminha_cart")) || [];
+    cart.push({
+      id: roteiro.id,
+      titulo: roteiro.titulo,
+      preco: roteiro.preco,
+      qtd: 1,
+      imagem: roteiro.imagem
+    });
+    localStorage.setItem("boeminha_cart", JSON.stringify(cart));
+    alert(`O roteiro "${roteiro.titulo}" foi adicionado ao seu carrinho!`);
+  };
+
   return (
-    <div style={{ paddingTop: '76px' }}>
-      <header className="page-header text-center text-white" style={{ background: 'linear-gradient(rgba(27, 67, 50, 0.85), rgba(45, 106, 79, 0.85)), url("https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg") no-repeat center center', backgroundSize: 'cover', padding: '80px 0' }}>
+    <div style={{ paddingTop: '76px', backgroundColor: '#f8fcf9', minHeight: '100vh' }}>
+      
+      {/* Header Roteiros */}
+      <header className="text-center text-white mb-5" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)', padding: '80px 0' }}>
         <div className="container">
-          <h1 className="display-5 fw-bold mb-3">Roteiros Guiados</h1>
-          <p className="lead opacity-75 mx-auto" style={{ maxWidth: '600px' }}>
-            Dias perfeitos planejados por quem conhece os segredos da cidade.
+          <h1 className="fw-bold mb-3" style={{ fontSize: '3rem', letterSpacing: '-1px' }}>Roteiros Guiados</h1>
+          <p className="lead opacity-75 mx-auto" style={{ maxWidth: '650px' }}>
+            Experiências completas desenhadas e conduzidas pelos melhores guias locais da cidade.
           </p>
         </div>
       </header>
 
-      <main className="container mb-5 mt-5">
-        <div className="row">
-          
-          <div className="col-12 mb-4">
-            <div className="card border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-md-row">
-              <div style={{ width: '100%', minHeight: '250px', backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/2/28/Fortaleza_de_santa_cruz.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} className="w-md-35"></div>
-              <div className="card-body p-4 w-md-65 d-flex flex-column">
-                <h3 className="fw-bold text-dark">O Clássico: Niemeyer, História e Pôr do Sol</h3>
-                <p className="text-muted mb-3">Um tour completo para quem quer conhecer a essência de Niterói. Começamos com uma visita guiada à Fortaleza de Santa Cruz, almoço livre na orla de São Francisco e finalizamos com a vista espetacular do MAC ao entardecer.</p>
-                <div className="d-flex gap-3 text-muted small fw-bold mb-4">
-                  <span><i className="fas fa-map-marker-alt text-success"></i> 3 Paradas</span>
-                  <span><i className="fas fa-walking text-success"></i> Caminhada Leve</span>
+      <main className="container mb-5">
+        <div className="row g-5">
+          {roteirosDb.map((roteiro) => (
+            <div className="col-lg-4 col-md-6" key={roteiro.id}>
+              <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column bg-white">
+                
+                {/* Imagem do Roteiro */}
+                <div style={{ height: '220px', backgroundImage: `url(${roteiro.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                  <span className="badge bg-dark text-white position-absolute bottom-0 start-0 m-3 p-2 fw-bold shadow-sm">
+                    <i className="far fa-clock me-1"></i> {roteiro.duracao}
+                  </span>
                 </div>
-                <div className="mt-auto d-flex justify-content-between align-items-end">
-                  <div>
-                    <p className="mb-0 fw-bold small">Guiado por: Carlos Silva</p>
-                    <span className="small text-muted"><i className="fas fa-star text-warning"></i> 4.9 (120 avaliações)</span>
+                
+                <div className="card-body p-4 d-flex flex-column">
+                  
+                  {/* Perfil do Guia */}
+                  <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <img src={roteiro.guia.foto} alt={roteiro.guia.nome} className="rounded-circle shadow-sm me-3" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                    <div>
+                      <p className="mb-0 fw-bold text-dark fs-6">{roteiro.guia.nome}</p>
+                      <p className="mb-0 small text-muted">{roteiro.guia.especialidade} • <i className="fas fa-star text-warning small"></i> {roteiro.guia.avaliacao}</p>
+                    </div>
                   </div>
-                  <div className="text-end">
-                    <span className="d-block fs-4 fw-bold text-success">R$ 85<small className="fs-6 text-muted">/pessoa</small></span>
-                    <button className="btn btn-success fw-bold rounded-pill px-4 mt-1">RESERVAR</button>
+
+                  <h4 className="fw-bold text-dark mb-2">{roteiro.titulo}</h4>
+                  <p className="text-muted small mb-4 flex-grow-1" style={{ lineHeight: '1.6' }}>{roteiro.descricao}</p>
+                  
+                  {/* Preço e Botão */}
+                  <div className="mt-auto d-flex justify-content-between align-items-center">
+                    <div>
+                      <span className="d-block small text-muted fw-bold">Por pessoa</span>
+                      <span className="fw-bold text-success fs-4">R$ {roteiro.preco.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                    
+                    <button onClick={() => adicionarAoCarrinho(roteiro)} className="btn btn-success fw-bold rounded-pill px-4 shadow-sm">
+                      <i className="fas fa-calendar-check me-2"></i> Reservar
+                    </button>
                   </div>
+
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="col-12 mb-4">
-            <div className="card border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-md-row">
-              <div style={{ width: '100%', minHeight: '250px', backgroundImage: "url('https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} className="w-md-35"></div>
-              <div className="card-body p-4 w-md-65 d-flex flex-column">
-                <h3 className="fw-bold text-dark">Circuito Boêmio da Cantareira</h3>
-                <p className="text-muted mb-3">Esqueça os roteiros turísticos tradicionais. Esse é um mergulho na verdadeira noite de Niterói. O roteiro inclui degustação em duas cervejarias locais, petiscos tradicionais em um boteco de raiz e encerramento em uma roda de samba.</p>
-                <div className="d-flex gap-3 text-muted small fw-bold mb-4">
-                  <span><i className="fas fa-beer text-success"></i> 2 Degustações</span>
-                  <span><i className="fas fa-moon text-success"></i> Roteiro Noturno</span>
-                </div>
-                <div className="mt-auto d-flex justify-content-between align-items-end">
-                  <div>
-                    <p className="mb-0 fw-bold small">Guiado por: Mariana Boemia</p>
-                    <span className="small text-muted"><i className="fas fa-star text-warning"></i> 5.0 (85 avaliações)</span>
-                  </div>
-                  <div className="text-end">
-                    <span className="d-block fs-4 fw-bold text-success">R$ 120<small className="fs-6 text-muted">/pessoa</small></span>
-                    <button className="btn btn-success fw-bold rounded-pill px-4 mt-1">RESERVAR</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          ))}
         </div>
       </main>
     </div>
