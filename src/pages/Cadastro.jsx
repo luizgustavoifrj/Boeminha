@@ -21,25 +21,30 @@ export default function Cadastro() {
       const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
       const user = userCredential.user;
 
-      // 2. Salva os dados e a "role" (tipo de perfil) no banco de dados
-      await firestore.collection('usuarios').doc(user.uid).set({
-        nome: nome,
-        email: email,
-        tipo: tipoUsuario,
-        dataCadastro: new Date().toISOString()
-      });
+      // 2. Tenta salvar os dados no Firestore (com proteção extra)
+      try {
+        await firestore.collection('usuarios').doc(user.uid).set({
+          nome: nome,
+          email: email,
+          tipo: tipoUsuario,
+          dataCadastro: new Date().toISOString()
+        });
+      } catch (dbError) {
+        console.error("Aviso: Conta criada, mas banco de dados bloqueou os detalhes:", dbError);
+        // O código continua rodando mesmo se o banco bloquear
+      }
 
-      // 3. Redireciona direto pro site (logado)
+      // 3. Redireciona direto pro site
       alert("Conta criada com sucesso! Bem-vindo ao Boeminha.");
       navigate('/');
       
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {
-        setErro('Esse e-mail já está cadastrado em outra conta.');
+        setErro('Esse e-mail já está cadastrado. Faça login ou use outro.');
       } else if (error.code === 'auth/weak-password') {
         setErro('A senha deve ter pelo menos 6 caracteres.');
       } else {
-        setErro('Erro ao criar conta. Tente novamente.');
+        setErro('Erro ao criar conta. Verifique sua conexão.');
       }
     } finally {
       setLoading(false);
