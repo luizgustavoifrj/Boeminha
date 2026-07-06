@@ -247,10 +247,9 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // LÓGICA PARA ATUALIZAR O MAPA SEMPRE QUE A LISTA MUDAR (AQUI ESTÁ O CONSERTO DOS PINOS!)
+  // LÓGICA DO MAPA COM CORES BASEADAS NAS CATEGORIAS
   useEffect(() => {
     if (!mapRef.current) {
-      // Inicia o mapa na primeira vez
       mapRef.current = L.map('map-container').setView([-22.92, -43.08], 12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap',
@@ -259,34 +258,56 @@ export default function Explorar() {
       markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
     }
 
-    // Limpa os pontos antigos
     markersLayerRef.current.clearLayers();
 
-    // CRIANDO O ÍCONE MANUALMENTE (À prova de falhas no React!)
-    const pinoPersonalizado = new L.Icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
-
-    // Adiciona os pontos novos baseados na lista atual filtrada usando o ícone consertado
+    // ADICIONAMOS A COR DO PINO VIA FILTRO CSS (HUE-ROTATE)
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
-        const marker = L.marker([attr.lat, attr.lng], { icon: pinoPersonalizado }).bindPopup(`<b>${attr.titulo}</b>`);
+        let filtroCss = '';
+
+        // Define a rotação de matriz de cor do pino azul baseado na categoria
+        if (filtroAtivo === 'favoritos') {
+          filtroCss = 'hue-rotate(110deg);'; // Roxo para Favoritos
+        } else if (attr.categoria === 'natureza') {
+          filtroCss = 'hue-rotate(220deg) brightness(0.9);'; // Verde para Natureza
+        } else if (attr.categoria === 'boemia') {
+          filtroCss = 'hue-rotate(320deg) saturate(1.5);'; // Laranja para Boemia
+        } else if (attr.categoria === 'gastronomia') {
+          filtroCss = 'hue-rotate(140deg) saturate(2);'; // Vermelho para Gastronomia
+        } else {
+          filtroCss = 'none;'; // Azul padrão para Cultura
+        }
+
+        // Criamos a imagem do ícone injetando a classe CSS que rotaciona a cor
+        const iconeColorido = new L.Icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+          className: `map-marker-icon-${attr.id}` // Geramos uma classe única
+        });
+
+        const marker = L.marker([attr.lat, attr.lng], { icon: iconeColorido }).bindPopup(`<b>${attr.titulo}</b>`);
         markersLayerRef.current.addLayer(marker);
+
+        // Aguarda meio segundo para o pino carregar no HTML e aplica o filtro de cor nele
+        setTimeout(() => {
+          const elementoImg = document.querySelector(`.map-marker-icon-${attr.id}`);
+          if (elementoImg) {
+            elementoImg.style.filter = filtroCss;
+          }
+        }, 100);
       }
     });
 
-    // Centraliza o mapa dando zoom para mostrar todos os locais da tela
     const bounds = atracoes.filter(a => a.lat && a.lng).map((a) => [a.lat, a.lng]);
     if (bounds.length > 0) {
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
     }
-  }, [atracoes]); 
+  }, [atracoes, filtroAtivo]); 
 
   // BUSCA PELA BARRA DE PESQUISA DA HOME
   useEffect(() => {
@@ -328,7 +349,6 @@ export default function Explorar() {
 
       <main className="container mb-5 mt-4">
         
-        {/* === MAPA REINTEGRADO AQUI === */}
         <h4 className="fw-bold mb-3">
           <i className="fas fa-map-marked-alt me-2 text-success"></i>
           Visão Geral
@@ -337,7 +357,6 @@ export default function Explorar() {
           id="map-container" 
           style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1 }}
         ></div>
-        {/* ============================== */}
 
         <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
           <h4 className="fw-bold m-0">
