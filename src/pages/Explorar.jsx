@@ -56,7 +56,7 @@ const atracoesDb = [
     lat: -22.9000, lng: -43.1150,
     dias: "Quarta a Domingo",
     horario: "18h às 01h",
-    endereco: "R. Américo Oberlaender, 580 - Santa Rosa"
+    endereco: "R. Américo Oberlaender, 580 - Sant Rosa"
   },
 
   // --- NATUREZA ---
