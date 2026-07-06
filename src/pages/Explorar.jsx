@@ -54,8 +54,6 @@ export default function Explorar() {
   const [filtroAtivo, setFiltroAtivo] = useState('all');
   const [favoritos, setFavoritos] = useState([]); 
   const [localSelecionado, setLocalSelecionado] = useState(null);
-  
-  // NOVO: Estado para controlar a animação do botão de carrinho
   const [adicionadoFeedback, setAdicionadoFeedback] = useState(false);
   
   const location = useLocation();
@@ -74,6 +72,11 @@ export default function Explorar() {
     }
     setFavoritos(novosFavs);
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
+
+    // Se estivermos na aba de favoritos e o usuário descurtir, remove da tela na hora!
+    if (filtroAtivo === 'favoritos') {
+      setAtracoes(atracoesDb.filter(a => novosFavs.includes(a.id)));
+    }
   };
 
   const adicionarAoCarrinho = (local) => {
@@ -93,7 +96,6 @@ export default function Explorar() {
     }
 
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
-    // Tirei o alert daqui!
   };
 
   useEffect(() => {
@@ -113,10 +115,13 @@ export default function Explorar() {
     }
   }, [location.search]);
 
+  // A LÓGICA DE FILTRO AGORA SABE LER A ABA "FAVORITOS"
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
     if (categoria === 'all') {
       setAtracoes(atracoesDb);
+    } else if (categoria === 'favoritos') {
+      setAtracoes(atracoesDb.filter(a => favoritos.includes(a.id)));
     } else {
       setAtracoes(atracoesDb.filter(a => a.categoria === categoria));
     }
@@ -133,7 +138,9 @@ export default function Explorar() {
 
       <main className="container mb-5 mt-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="fw-bold m-0">Catálogo Completo</h4>
+          <h4 className="fw-bold m-0">
+            {filtroAtivo === 'favoritos' ? 'Sua Lista de Desejos' : 'Catálogo Completo'}
+          </h4>
           <span className="small fw-bold text-muted">{atracoes.length} Resultados</span>
         </div>
 
@@ -142,51 +149,68 @@ export default function Explorar() {
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'natureza' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('natureza')}><i className="fas fa-tree me-1"></i> Natureza</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'boemia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('boemia')}><i className="fas fa-beer me-1"></i> Boemia</button>
           <button className={`btn rounded-pill fw-bold ${filtroAtivo === 'cultura' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('cultura')}><i className="fas fa-palette me-1"></i> Cultura</button>
+          
+          {/* BOTÃO DE MEUS FAVORITOS (Jogado para a direita com ms-auto e com as cores rubro-negras) */}
+          <button 
+            className={`btn rounded-pill fw-bold ms-lg-auto ${filtroAtivo === 'favoritos' ? 'btn-danger' : 'btn-outline-danger'}`} 
+            onClick={() => filtrar('favoritos')}
+          >
+            <i className="fas fa-heart me-1"></i> Meus Favoritos
+          </button>
         </div>
 
         <div className="row g-4">
-          {atracoes.map(attr => (
-            <div className="col-lg-4 col-md-6" key={attr.id}>
-              <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
-                  <button 
-                    onClick={() => toggleFav(attr.id)}
-                    style={{
-                      position: 'absolute', top: '15px', right: '15px',
-                      background: 'rgba(255, 255, 255, 0.9)', border: 'none',
-                      width: '36px', height: '36px', borderRadius: '50%',
-                      color: favoritos.includes(attr.id) ? '#e63946' : '#ccc',
-                      transition: '0.3s', zIndex: 10
-                    }}
-                  >
-                    <i className="fas fa-heart"></i>
-                  </button>
-                </div>
-                <div className="card-body d-flex flex-column p-4">
-                  <span className={`badge bg-light text-dark mb-2 align-self-start`}>{attr.tag}</span>
-                  <h5 className="fw-bold">{attr.titulo}</h5>
-                  <p className="text-muted small flex-grow-1">{attr.descricao}</p>
-                  <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                    <span className="fw-bold text-success">{attr.preco}</span>
-                    
+          {atracoes.length === 0 ? (
+            <div className="col-12 text-center py-5">
+              <i className="fas fa-heart-broken mb-3" style={{ fontSize: '3rem', color: '#ccc' }}></i>
+              <h5 className="fw-bold text-muted">Nenhum local encontrado.</h5>
+              {filtroAtivo === 'favoritos' && (
+                <p className="text-muted">Você ainda não favoritou nenhuma experiência.</p>
+              )}
+            </div>
+          ) : (
+            atracoes.map(attr => (
+              <div className="col-lg-4 col-md-6" key={attr.id}>
+                <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                  <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
                     <button 
-                      className="btn btn-sm btn-outline-dark fw-bold"
-                      onClick={() => {
-                        setLocalSelecionado(attr);
-                        setAdicionadoFeedback(false); // Reseta o visual do botão ao abrir um novo
+                      onClick={() => toggleFav(attr.id)}
+                      style={{
+                        position: 'absolute', top: '15px', right: '15px',
+                        background: 'rgba(255, 255, 255, 0.9)', border: 'none',
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        color: favoritos.includes(attr.id) ? '#e63946' : '#ccc',
+                        transition: '0.3s', zIndex: 10
                       }}
                     >
-                      Ver Detalhes
+                      <i className="fas fa-heart"></i>
                     </button>
+                  </div>
+                  <div className="card-body d-flex flex-column p-4">
+                    <span className={`badge bg-light text-dark mb-2 align-self-start`}>{attr.tag}</span>
+                    <h5 className="fw-bold">{attr.titulo}</h5>
+                    <p className="text-muted small flex-grow-1">{attr.descricao}</p>
+                    <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                      <span className="fw-bold text-success">{attr.preco}</span>
+                      
+                      <button 
+                        className="btn btn-sm btn-outline-dark fw-bold"
+                        onClick={() => {
+                          setLocalSelecionado(attr);
+                          setAdicionadoFeedback(false);
+                        }}
+                      >
+                        Ver Detalhes
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </main>
 
-      {/* JANELA DO MODAL */}
       {localSelecionado && (
         <div 
           onClick={() => setLocalSelecionado(null)}
@@ -224,15 +248,13 @@ export default function Explorar() {
               <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2 pt-4 border-top">
                 <h4 className="fw-bold text-success m-0 mb-3 mb-sm-0">{localSelecionado.preco}</h4>
                 
-                {/* BOTÃO SEM ALERT COM FEEDBACK VISUAL */}
                 <button 
                   className={`btn px-4 py-2 fw-bold rounded-pill ${adicionadoFeedback ? 'btn-dark' : 'btn-success'}`}
                   disabled={adicionadoFeedback}
                   onClick={() => {
                     adicionarAoCarrinho(localSelecionado);
-                    setAdicionadoFeedback(true); // Muda o botão para "Adicionado!"
+                    setAdicionadoFeedback(true); 
                     
-                    // Fecha a janela sozinho depois de 1.2 segundos
                     setTimeout(() => {
                       setLocalSelecionado(null);
                       setAdicionadoFeedback(false);
