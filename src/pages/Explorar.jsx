@@ -56,7 +56,7 @@ const atracoesDb = [
     lat: -22.9000, lng: -43.1150,
     dias: "Quarta a Domingo",
     horario: "18h às 01h",
-    endereco: "R. Américo Oberlaender, 580 - Sant Rosa"
+    endereco: "R. Américo Oberlaender, 580 - Santa Rosa"
   },
 
   // --- NATUREZA ---
@@ -247,7 +247,7 @@ const formatarPrecoParaNumero = (precoStr) => {
 
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
-  const [filtroAtActive, setFiltroAtivo] = useState('all');
+  const [filtroAtivo, setFiltroAtivo] = useState('all');
   const [favoritos, setFavoritos] = useState([]); 
   const [localSelecionado, setLocalSelecionado] = useState(null);
   const [adicionadoFeedback, setAdicionadoFeedback] = useState(false);
@@ -269,7 +269,7 @@ export default function Explorar() {
     setFavoritos(novosFavs);
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
 
-    if (filtroAtActive === 'favoritos') {
+    if (filtroAtivo === 'favoritos') {
       setAtracoes(atracoesDb.filter(a => novosFavs.includes(a.id)));
     }
   };
@@ -292,6 +292,9 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
+  // ======================================================================
+  // MAPA REINICIADO DO ZERO A CADA FILTRO (TRAVA ANTI-GHOST)
+  // ======================================================================
   useEffect(() => {
     const container = document.getElementById('map-container');
     if (!container) return;
@@ -305,20 +308,20 @@ export default function Explorar() {
     const markersLayer = L.layerGroup().addTo(mapa);
 
     const obterPinoModerno = (categoria, isFavoritoView) => {
-      let cor = '#0077b6'; 
+      let cor = '#0077b6'; // Azul Padrão (Cultura)
       let icone = 'fa-palette'; 
       
       if (isFavoritoView) {
-        cor = '#9b59b6'; 
+        cor = '#9b59b6'; // Roxo
         icone = 'fa-heart';
       } else if (categoria === 'natureza') {
-        cor = '#2d6a4f'; 
+        cor = '#2d6a4f'; // Verde
         icone = 'fa-tree';
       } else if (categoria === 'boemia') {
-        cor = '#d68c45'; 
+        cor = '#d68c45'; // Laranja
         icone = 'fa-beer';
       } else if (categoria === 'gastronomia') {
-        cor = '#e63946'; 
+        cor = '#e63946'; // Vermelho
         icone = 'fa-coffee';
       }
 
@@ -350,7 +353,7 @@ export default function Explorar() {
 
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
-        const iconePronto = obterPinoModerno(attr.categoria, filtroAtActive === 'favoritos');
+        const iconePronto = obterPinoModerno(attr.categoria, filtroAtivo === 'favoritos');
         L.marker([attr.lat, attr.lng], { icon: iconePronto })
          .bindPopup(`<b>${attr.titulo}</b>`)
          .addTo(markersLayer);
@@ -365,7 +368,7 @@ export default function Explorar() {
     return () => {
       mapa.remove();
     };
-  }, [atracoes, filtroAtActive]); 
+  }, [atracoes, filtroAtivo]); 
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -397,6 +400,30 @@ export default function Explorar() {
 
   return (
     <div style={{ paddingTop: '76px' }}>
+      
+      {/* ESTILOS CUSTOMIZADOS PARA AS CORES DOS BOTÕES DO FILTRO (HOVER E ACTIVE) */}
+      <style>
+        {`
+          .btn-cat-all { color: #343a40; border: 2px solid #343a40; background: transparent; }
+          .btn-cat-all:hover, .btn-cat-all.active { background-color: #343a40; color: white; }
+
+          .btn-cat-natureza { color: #2d6a4f; border: 2px solid #2d6a4f; background: transparent; }
+          .btn-cat-natureza:hover, .btn-cat-natureza.active { background-color: #2d6a4f; color: white; }
+
+          .btn-cat-boemia { color: #d68c45; border: 2px solid #d68c45; background: transparent; }
+          .btn-cat-boemia:hover, .btn-cat-boemia.active { background-color: #d68c45; color: white; }
+
+          .btn-cat-gastronomia { color: #e63946; border: 2px solid #e63946; background: transparent; }
+          .btn-cat-gastronomia:hover, .btn-cat-gastronomia.active { background-color: #e63946; color: white; }
+
+          .btn-cat-cultura { color: #0077b6; border: 2px solid #0077b6; background: transparent; }
+          .btn-cat-cultura:hover, .btn-cat-cultura.active { background-color: #0077b6; color: white; }
+
+          .btn-cat-favoritos { color: #9b59b6; border: 2px solid #9b59b6; background: transparent; }
+          .btn-cat-favoritos:hover, .btn-cat-favoritos.active { background-color: #9b59b6; color: white; }
+        `}
+      </style>
+
       <section className="page-header" style={{ background: '#ffffff', padding: '40px 0', borderBottom: '1px solid #eee' }}>
         <div className="container">
           <h1 className="fw-bold text-dark">Explore Niterói</h1>
@@ -413,26 +440,37 @@ export default function Explorar() {
         
         <div 
           id="map-container" 
-          key={filtroAtActive} 
+          key={filtroAtivo} 
           style={{ height: '400px', borderRadius: '16px', border: '2px solid #eee', marginBottom: '40px', zIndex: 1, backgroundColor: '#f5f5f5' }}
         ></div>
 
         <div className="d-flex justify-content-between align-items-center mb-4 mt-5">
           <h4 className="fw-bold m-0">
-            {filtroAtActive === 'favoritos' ? 'Sua Lista de Desejos' : 'Catálogo Completo'}
+            {filtroAtivo === 'favoritos' ? 'Sua Lista de Desejos' : 'Catálogo Completo'}
           </h4>
           <span className="small fw-bold text-muted">{atracoes.length} Resultados</span>
         </div>
 
+        {/* BOTÕES DE FILTRO AGORA COM AS CORES TEMÁTICAS */}
         <div className="filter-container d-flex gap-2 mb-4 flex-wrap">
-          <button className={`btn rounded-pill fw-bold ${filtroAtActive === 'all' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('all')}>Todos os Locais</button>
-          <button className={`btn rounded-pill fw-bold ${filtroAtActive === 'natureza' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('natureza')}><i className="fas fa-tree me-1"></i> Natureza</button>
-          <button className={`btn rounded-pill fw-bold ${filtroAtActive === 'boemia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('boemia')}><i className="fas fa-beer me-1"></i> Boemia</button>
-          <button className={`btn rounded-pill fw-bold ${filtroAtActive === 'gastronomia' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('gastronomia')}><i className="fas fa-coffee me-1"></i> Gastronomia</button>
-          <button className={`btn rounded-pill fw-bold ${filtroAtActive === 'cultura' ? 'btn-success' : 'btn-outline-secondary'}`} onClick={() => filtrar('cultura')}><i className="fas fa-palette me-1"></i> Cultura</button>
+          <button className={`btn rounded-pill fw-bold btn-cat-all ${filtroAtivo === 'all' ? 'active' : ''}`} onClick={() => filtrar('all')}>
+            Todos os Locais
+          </button>
+          <button className={`btn rounded-pill fw-bold btn-cat-natureza ${filtroAtivo === 'natureza' ? 'active' : ''}`} onClick={() => filtrar('natureza')}>
+            <i className="fas fa-tree me-1"></i> Natureza
+          </button>
+          <button className={`btn rounded-pill fw-bold btn-cat-boemia ${filtroAtivo === 'boemia' ? 'active' : ''}`} onClick={() => filtrar('boemia')}>
+            <i className="fas fa-beer me-1"></i> Boemia
+          </button>
+          <button className={`btn rounded-pill fw-bold btn-cat-gastronomia ${filtroAtivo === 'gastronomia' ? 'active' : ''}`} onClick={() => filtrar('gastronomia')}>
+            <i className="fas fa-coffee me-1"></i> Gastronomia
+          </button>
+          <button className={`btn rounded-pill fw-bold btn-cat-cultura ${filtroAtivo === 'cultura' ? 'active' : ''}`} onClick={() => filtrar('cultura')}>
+            <i className="fas fa-palette me-1"></i> Cultura
+          </button>
           
           <button 
-            className={`btn rounded-pill fw-bold ms-lg-auto ${filtroAtActive === 'favoritos' ? 'btn-danger' : 'btn-outline-danger'}`} 
+            className={`btn rounded-pill fw-bold ms-lg-auto btn-cat-favoritos ${filtroAtivo === 'favoritos' ? 'active' : ''}`} 
             onClick={() => filtrar('favoritos')}
           >
             <i className="fas fa-heart me-1"></i> Meus Favoritos
@@ -444,7 +482,7 @@ export default function Explorar() {
             <div className="col-12 text-center py-5">
               <i className="fas fa-heart-broken mb-3" style={{ fontSize: '3rem', color: '#ccc' }}></i>
               <h5 className="fw-bold text-muted">Nenhum local encontrado.</h5>
-              {filtroAtActive === 'favoritos' && (
+              {filtroAtivo === 'favoritos' && (
                 <p className="text-muted">Você ainda não favoritou nenhuma experiência.</p>
               )}
             </div>
@@ -491,9 +529,7 @@ export default function Explorar() {
         </div>
       </main>
 
-      {/* ========================================================
-          JANELA MODAL ATUALIZADA COM DIAS, HORÁRIOS E ENDEREÇO
-          ======================================================== */}
+      {/* JANELA MODAL ATUALIZADA */}
       {localSelecionado && (
         <div 
           onClick={() => setLocalSelecionado(null)}
@@ -508,7 +544,7 @@ export default function Explorar() {
             style={{
               background: '#fff', borderRadius: '20px', maxWidth: '500px', width: '100%',
               overflow: 'hidden', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-              maxHeight: '90vh', overflowY: 'auto' // Permite rolar a janela se a tela for pequena
+              maxHeight: '90vh', overflowY: 'auto'
             }}
           >
             <button 
@@ -529,7 +565,6 @@ export default function Explorar() {
               <h3 className="fw-bold mb-3">{localSelecionado.titulo}</h3>
               <p className="text-muted mb-4" style={{ lineHeight: '1.5', fontSize: '0.95rem' }}>{localSelecionado.descricao}</p>
               
-              {/* === CAIXA DE INFORMAÇÕES ÚTEIS === */}
               <div className="bg-light p-3 rounded-3 mb-4" style={{ border: '1px solid #eee' }}>
                 <div className="d-flex align-items-center mb-2">
                   <i className="far fa-calendar-alt text-success me-3" style={{ width: '20px', textAlign: 'center' }}></i>
@@ -544,28 +579,34 @@ export default function Explorar() {
                   <span className="text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.4' }}><strong>Endereço:</strong> {localSelecionado.endereco}</span>
                 </div>
               </div>
-              {/* ================================== */}
               
               <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-2 border-top">
                 <h4 className="fw-bold text-success m-0 mb-3 mb-sm-0">{localSelecionado.preco}</h4>
                 
-                <button 
-                  className={`btn px-4 py-2 fw-bold rounded-pill ${adicionadoFeedback ? 'btn-dark' : 'btn-success'}`}
-                  disabled={adicionadoFeedback}
-                  onClick={() => {
-                    adicionarAoCarrinho(localSelecionado);
-                    setAdicionadoFeedback(true); 
-                    
-                    setTimeout(() => {
-                      setLocalSelecionado(null);
-                      setAdicionadoFeedback(false);
-                    }, 1200);
-                  }}
-                  style={{ transition: '0.3s ease' }}
-                >
-                  <i className={`fas ${adicionadoFeedback ? 'fa-check' : 'fa-cart-plus'} me-2`}></i>
-                  {adicionadoFeedback ? 'Adicionado!' : 'Adicionar ao Carrinho'}
-                </button>
+                {/* LÓGICA DO CARRINHO PARA ITENS GRATUITOS */}
+                {localSelecionado.preco.toLowerCase().includes('gratuito') ? (
+                  <div className="badge bg-success px-4 py-2 fs-6 rounded-pill d-flex align-items-center" style={{ gap: '8px' }}>
+                    <i className="fas fa-door-open"></i> Acesso Livre
+                  </div>
+                ) : (
+                  <button 
+                    className={`btn px-4 py-2 fw-bold rounded-pill ${adicionadoFeedback ? 'btn-dark' : 'btn-success'}`}
+                    disabled={adicionadoFeedback}
+                    onClick={() => {
+                      adicionarAoCarrinho(localSelecionado);
+                      setAdicionadoFeedback(true); 
+                      
+                      setTimeout(() => {
+                        setLocalSelecionado(null);
+                        setAdicionadoFeedback(false);
+                      }, 1200);
+                    }}
+                    style={{ transition: '0.3s ease' }}
+                  >
+                    <i className={`fas ${adicionadoFeedback ? 'fa-check' : 'fa-cart-plus'} me-2`}></i>
+                    {adicionadoFeedback ? 'Adicionado!' : 'Adicionar ao Carrinho'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
