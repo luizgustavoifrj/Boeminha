@@ -40,12 +40,25 @@ const atracoesDb = [
   }
 ];
 
+// FUNÇÃO PARA TRADUZIR O PREÇO DE TEXTO PARA NÚMERO MATEMÁTICO (ex: "R$ 25,00" vira 25.00)
+const formatarPrecoParaNumero = (precoStr) => {
+  if (precoStr.toLowerCase().includes('gratuito')) return 0;
+  // Extrai só os números e a vírgula (Ex: "A partir de R$ 10,50" vira "10,50")
+  const numeros = precoStr.match(/[\d,]+/);
+  if (numeros) {
+    return parseFloat(numeros[0].replace(',', '.')); // Troca vírgula por ponto para a matemática funcionar
+  }
+  return 0;
+};
+
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
   const [filtroAtivo, setFiltroAtivo] = useState('all');
+  
+  // Favoritos continua existindo apenas para o "Coraçãozinho"
   const [favoritos, setFavoritos] = useState([]); 
   
-  // NOVO ESTADO: Guarda os dados do local que o usuário clicou para ver os detalhes
+  // Estado para controlar a Janela (Modal)
   const [localSelecionado, setLocalSelecionado] = useState(null);
   
   const location = useLocation();
@@ -64,6 +77,33 @@ export default function Explorar() {
     }
     setFavoritos(novosFavs);
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
+  };
+
+  // LÓGICA OFICIAL PARA MANDAR PRO CARRINHO DE COMPRAS
+  const adicionarAoCarrinho = (local) => {
+    // 1. Puxa o carrinho que já existe (ou cria um novo se estiver vazio)
+    const cartSalvo = JSON.parse(localStorage.getItem('boeminha_cart')) || [];
+    
+    // 2. Verifica se a atração já está no carrinho
+    const itemExistente = cartSalvo.find(item => item.id === local.id);
+
+    if (itemExistente) {
+      itemExistente.qtd += 1; // Se já tem, só aumenta a quantidade
+    } else {
+      // Se não tem, coloca o item formatado do jeitinho que o seu arquivo Cart.jsx gosta
+      cartSalvo.push({
+        id: local.id,
+        titulo: local.titulo,
+        imagem: local.imagem,
+        preco: formatarPrecoParaNumero(local.preco), 
+        qtd: 1
+      });
+    }
+
+    // 3. Salva no navegador e fecha a janela para o usuário continuar navegando
+    localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
+    alert(`${local.titulo} adicionado ao carrinho!`); // Feedback rápido
+    setLocalSelecionado(null); // Fecha a janela do modal
   };
 
   useEffect(() => {
@@ -119,6 +159,8 @@ export default function Explorar() {
             <div className="col-lg-4 col-md-6" key={attr.id}>
               <div className="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
                 <div style={{ height: '200px', backgroundImage: `url(${attr.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
+                  
+                  {/* BOTÃO DE FAVORITAR CONTINUA FUNCIONANDO NORMAL */}
                   <button 
                     onClick={() => toggleFav(attr.id)}
                     style={{
@@ -139,7 +181,6 @@ export default function Explorar() {
                   <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                     <span className="fw-bold text-success">{attr.preco}</span>
                     
-                    {/* QUANDO CLICAR, AVISA O REACT QUAL LOCAL DEVE ABRIR NA JANELA */}
                     <button 
                       className="btn btn-sm btn-outline-dark fw-bold"
                       onClick={() => setLocalSelecionado(attr)}
@@ -154,25 +195,23 @@ export default function Explorar() {
         </div>
       </main>
 
-      {/* A JANELA (MODAL) COMEÇA AQUI */}
+      {/* JANELA DO MODAL */}
       {localSelecionado && (
         <div 
-          onClick={() => setLocalSelecionado(null)} // Clicar fora da janela fecha ela
+          onClick={() => setLocalSelecionado(null)}
           style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
             backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999,
             display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px'
           }}
         >
-          {/* Caixa Branca da Janela */}
           <div 
-            onClick={(e) => e.stopPropagation()} // Impede que o clique dentro da caixa feche a janela
+            onClick={(e) => e.stopPropagation()} 
             style={{
               background: '#fff', borderRadius: '20px', maxWidth: '500px', width: '100%',
               overflow: 'hidden', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.3)'
             }}
           >
-            {/* Botão de Fechar no canto */}
             <button 
               onClick={() => setLocalSelecionado(null)}
               style={{
@@ -184,10 +223,8 @@ export default function Explorar() {
               <i className="fas fa-times"></i>
             </button>
 
-            {/* Imagem Gigante */}
             <div style={{ height: '250px', backgroundImage: `url(${localSelecionado.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
             
-            {/* Corpo da Janela */}
             <div className="p-4 p-md-5">
               <span className="badge bg-light text-dark mb-2">{localSelecionado.tag}</span>
               <h3 className="fw-bold mb-3">{localSelecionado.titulo}</h3>
@@ -196,22 +233,19 @@ export default function Explorar() {
               <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-2 pt-4 border-top">
                 <h4 className="fw-bold text-success m-0 mb-3 mb-sm-0">{localSelecionado.preco}</h4>
                 
-                {/* Botão de Adicionar ao Carrinho dentro da Janela */}
+                {/* BOTÃO DO CARRINHO DE COMPRAS CONECTADO COM SUCESSO! */}
                 <button 
-                  className={`btn px-4 py-2 fw-bold rounded-pill ${favoritos.includes(localSelecionado.id) ? 'btn-danger' : 'btn-success'}`}
-                  onClick={() => {
-                    toggleFav(localSelecionado.id);
-                  }}
+                  className="btn btn-success px-4 py-2 fw-bold rounded-pill"
+                  onClick={() => adicionarAoCarrinho(localSelecionado)}
                 >
-                  <i className={`fas ${favoritos.includes(localSelecionado.id) ? 'fa-trash' : 'fa-cart-plus'} me-2`}></i>
-                  {favoritos.includes(localSelecionado.id) ? 'Remover' : 'Colocar no Carrinho'}
+                  <i className="fas fa-cart-plus me-2"></i>
+                  Adicionar ao Carrinho
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      {/* FIM DA JANELA (MODAL) */}
 
     </div>
   );
