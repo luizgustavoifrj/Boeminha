@@ -50,7 +50,7 @@ const atracoesDb = [
   // --- NATUREZA ---
   {
     id: "costao",
-    titulo: "Costão de Itacoatiara",
+    titulo: "lindoa costão de Itacoatiara",
     categoria: "natureza",
     tag: "Trilha & Mirante",
     descricao: "Trilha clássica com visual panorâmico do Oceano Atlântico.",
