@@ -65,7 +65,7 @@ const atracoesDb = [
     titulo: "Costão de Itacoatiara",
     categoria: "natureza",
     tag: "Trilha & Mirante",
-    descricao: "Trilha clássica, curta e de intensidade média, com visual panorâmico do Oceano Atlântico.",
+    descricao: "Trilha clássica, curta e de intensidade média, com  vvisual panorâmico do Oceano Atlântico.",
     preco: "Gratuito",
     imagem: "https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg",
     lat: -22.9760, lng: -43.0275,
