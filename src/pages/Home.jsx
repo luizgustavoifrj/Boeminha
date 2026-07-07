@@ -176,7 +176,7 @@ export default function Home() {
         <div className="bento-grid d-grid gap-3" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 220px)' }}>
           
           {/* Card 1: Vida Noturna */}
-          <Link to="/explorar?busca=samba" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://images.unsplash.com/photo-1533174000265-e8cb97092147?q=80&w=1000')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to="/explorar?busca=samba" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://almalondrina.com.br/wp-content/uploads/2018/03/Ziriguidum_23_03_2018.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold shadow"><i className="fas fa-star me-1"></i> IMPERDÍVEL</span>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
               <p className="small mb-1 text-uppercase text-warning fw-bold" style={{ letterSpacing: '1px' }}>Vida Noturna</p>
@@ -193,7 +193,7 @@ export default function Home() {
           </Link>
 
           {/* Card 3: Trilhas */}
-          <Link to="/explorar?busca=trilha" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to="/explorar?busca=trilha" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdW1PqP3x5CsvLazZ48PnQHV3CApbKjzbtry-7hCqvv8d0tE17nai2G5Mm&s=10')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
               <p className="small mb-0 text-uppercase text-success fw-bold" style={{ letterSpacing: '1px' }}>Ecoturismo</p>
               <h3 className="fw-bold fs-5 mb-0 text-white">Trilhas & Mirantes</h3>
