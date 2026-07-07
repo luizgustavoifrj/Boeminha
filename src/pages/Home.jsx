@@ -5,8 +5,11 @@ import { atracoesDb } from '../data/database';
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sugestoes, setSugestoes] = useState([]);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  
   const navigate = useNavigate();
 
+  // LÓGICA DE AUTOCOMPLETE INTELIGENTE
   const handleSearchInput = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -14,11 +17,14 @@ export default function Home() {
     if (query.trim().length > 0) {
       const filtradas = atracoesDb.filter(attr => 
         attr.titulo.toLowerCase().includes(query.toLowerCase()) || 
-        attr.tag.toLowerCase().includes(query.toLowerCase())
+        attr.tag.toLowerCase().includes(query.toLowerCase()) ||
+        attr.categoria.toLowerCase().includes(query.toLowerCase())
       );
       setSugestoes(filtradas);
+      setMostrarSugestoes(true);
     } else {
       setSugestoes([]);
+      setMostrarSugestoes(false);
     }
   };
 
@@ -26,11 +32,16 @@ export default function Home() {
     const busca = termo || searchQuery;
     if (busca.trim() !== '') {
       navigate(`/explorar?busca=${encodeURIComponent(busca)}`);
+    } else {
+      navigate(`/explorar`);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') realizarBusca();
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setMostrarSugestoes(false);
+      realizarBusca();
+    }
   };
 
   return (
@@ -50,14 +61,17 @@ export default function Home() {
           </p>
           
           <div className="search-container mx-auto position-relative" style={{ maxWidth: '600px', zIndex: 1050 }}>
-            <div className="search-box bg-white p-2 rounded-pill d-flex shadow position-relative">
+            {/* O Z-INDEX 1060 AQUI GARANTE QUE A BARRA NUNCA SERÁ COBERTA POR NADA */}
+            <div className="search-box bg-white p-2 rounded-pill d-flex shadow position-relative" style={{ zIndex: 1060 }}>
               <input 
                 type="text" 
-                className="form-control border-0 bg-transparent shadow-none px-3 fw-medium" 
+                className="form-control border-0 bg-transparent shadow-none px-3 fw-medium text-dark" 
                 placeholder="O que você quer explorar hoje?" 
                 value={searchQuery}
                 onChange={handleSearchInput}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
+                onFocus={() => { if(sugestoes.length > 0) setMostrarSugestoes(true); }}
+                onBlur={() => setTimeout(() => setMostrarSugestoes(false), 200)}
                 autoComplete="off"
               />
               <button className="btn btn-success rounded-pill px-4 fw-bold" onClick={() => realizarBusca()}>
@@ -65,24 +79,30 @@ export default function Home() {
               </button>
             </div>
             
-            {sugestoes.length > 0 && (
-              <div className="suggestions-box position-absolute bg-white w-100 text-start shadow" style={{ top: '50%', left: 0, borderRadius: '0 0 20px 20px', paddingTop: '35px', zIndex: 1040, maxHeight: '250px', overflowY: 'auto' }}>
-                {sugestoes.map((attr) => (
+            {/* O DROPDOWN INTELIGENTE AGORA COM TOP: 100% PARA DESCER CORRETAMENTE E MAX-HEIGHT PARA ROLAGEM */}
+            {mostrarSugestoes && sugestoes.length > 0 && (
+              <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
+                {sugestoes.map((sug) => (
                   <div 
-                    key={attr.id} 
-                    className="suggestion-item d-flex align-items-center p-3 border-bottom text-dark" 
-                    style={{ cursor: 'pointer', fontWeight: 600 }}
+                    key={sug.id} 
+                    className="px-4 py-3 text-dark fw-bold d-flex justify-content-between align-items-center"
+                    style={{ cursor: 'pointer', transition: '0.2s', fontSize: '0.95rem', borderBottom: '1px solid #f8f9fa' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
                     onClick={() => {
-                      setSearchQuery(attr.titulo);
+                      setSearchQuery(sug.titulo);
                       setSugestoes([]);
-                      realizarBusca(attr.titulo);
+                      realizarBusca(sug.titulo);
                     }}
                   >
-                    <i className="fas fa-map-marker-alt text-success me-3 fs-5"></i>
-                    <div>
-                      {attr.titulo} <br/>
-                      <span style={{ fontSize: '0.75rem', opacity: 0.7, fontWeight: 500 }}>{attr.tag}</span>
+                    <div className="d-flex align-items-center">
+                      <i className="fas fa-map-marker-alt text-success me-3 fs-5"></i>
+                      <div className="text-start">
+                        {sug.titulo} <br/>
+                        <span className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 500 }}>{sug.tag}</span>
+                      </div>
                     </div>
+                    <i className="fas fa-arrow-right text-light opacity-50" style={{ fontSize: '0.8rem' }}></i>
                   </div>
                 ))}
               </div>
@@ -106,20 +126,20 @@ export default function Home() {
             </div>
           </a>
           
-          <Link to="/explorar" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://conteudo.imguol.com.br/c/entretenimento/d4/2021/02/04/cada-cerveja-tem-um-tipo-especifico-de-copo-para-manter-as-principais-caracteristicas-veja-opcoes-1612483971132_v2_1x1.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to="/explorar?busca=boemia" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://conteudo.imguol.com.br/c/entretenimento/d4/2021/02/04/cada-cerveja-tem-um-tipo-especifico-de-copo-para-manter-as-principais-caracteristicas-veja-opcoes-1612483971132_v2_1x1.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-handshake me-1"></i> PARCEIRO</span>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
               <h3 className="fw-bold fs-4 mb-0">Gastronomia Raiz: Os melhores botecos</h3>
             </div>
           </Link>
 
-          <Link to="/explorar" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to="/explorar?busca=natureza" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
               <h3 className="fw-bold fs-5 mb-0">Trilhas Guiadas</h3>
             </div>
           </Link>
 
-          <Link to="/explorar" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+          <Link to="/explorar?busca=cultura" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
             <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
               <h3 className="fw-bold fs-5 mb-0">Cultura e Arte</h3>
             </div>
@@ -132,7 +152,7 @@ export default function Home() {
           <div className="glass-card mx-auto bg-light rounded-4 p-5 border" style={{ maxWidth: '850px' }}>
             <h2 className="fw-bold mb-3 text-dark">Conecte seu negócio a novos exploradores.</h2>
             <p className="text-muted mb-4 px-lg-4">
-              O BoeMinha é a viaitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
+              O BoeMinha é a vitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
             </p>
             <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
               <Link to="/midia-kit" className="btn btn-success rounded-pill px-4 py-2 fw-bold">VER MÍDIA KIT</Link>
