@@ -97,6 +97,36 @@ export default function Perfil() {
     }
   };
 
+  // --- FUNÇÕES ADMIN ---
+  const aprovarParceiro = async (id) => {
+    try {
+      await firestore.collection('solicitacoes_parceria').doc(id).update({ status: 'Aprovado' });
+      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Aprovado' } : s));
+      setSolicitacaoSelecionada(null);
+    } catch (e) {
+      alert("Erro ao aprovar.");
+    }
+  };
+
+  const reprovarParceiro = async (id) => {
+    if (window.confirm("Deseja realmente reprovar esta solicitação?")) {
+      try {
+        await firestore.collection('solicitacoes_parceria').doc(id).update({ status: 'Reprovado' });
+        setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Reprovado' } : s));
+        setSolicitacaoSelecionada(null);
+      } catch (e) {
+        alert("Erro ao reprovar.");
+      }
+    }
+  };
+
+  const contatarWhatsApp = (numero) => {
+    if (!numero) return;
+    const numeroLimpo = numero.replace(/\D/g, ''); // Remove parênteses e traços
+    window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
+  };
+
+  // --- FUNÇÕES GUIA ---
   const abrirNovoRoteiro = () => {
     setEditandoRoteiroId(null);
     setNovoRoteiro({ titulo: '', descricao: '', preco: '', duracao: '', horario: '', imagemUrl: '' });
@@ -124,12 +154,12 @@ export default function Perfil() {
       if (editandoRoteiroId) {
         await firestore.collection('roteiros').doc(editandoRoteiroId).update(roteiroFinal);
         setMeusRoteiros(meusRoteiros.map(r => r.id === editandoRoteiroId ? { id: editandoRoteiroId, ...roteiroFinal } : r));
-        alert('Roteiro atualizado!');
+        alert('Roteiro atualizado com sucesso!');
       } else {
         roteiroFinal.dataCriacao = new Date().toISOString();
         const docRef = await firestore.collection('roteiros').add(roteiroFinal);
         setMeusRoteiros([{ id: docRef.id, ...roteiroFinal }, ...meusRoteiros]);
-        alert('Roteiro publicado!');
+        alert('Roteiro criado com sucesso!');
       }
       setModalRoteiro(false);
     } catch (error) {
@@ -144,16 +174,6 @@ export default function Perfil() {
     }
   };
 
-  const aprovarParceiro = async (id) => {
-    try {
-      await firestore.collection('solicitacoes_parceria').doc(id).update({ status: 'Aprovado' });
-      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Aprovado' } : s));
-      alert("Parceiro aprovado com sucesso! Um e-mail será enviado a ele.");
-    } catch (e) {
-      alert("Erro ao aprovar.");
-    }
-  };
-
   if (loading) return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}><div className="spinner-border text-success"></div></div>;
 
   const proximosEventos = pedidos.filter(p => p.dataAgendada);
@@ -162,6 +182,7 @@ export default function Perfil() {
   return (
     <div style={{ paddingTop: '76px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       
+      {/* HEADER PERFIL */}
       <header className="bg-white border-bottom py-5 mb-4 shadow-sm">
         <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
           <div className="d-flex align-items-center">
@@ -375,7 +396,7 @@ export default function Perfil() {
                         <tr>
                           <th>Nome</th>
                           <th>Tipo</th>
-                          <th>E-mail</th>
+                          <th>WhatsApp</th>
                           <th>Status</th>
                           <th>Ação</th>
                         </tr>
@@ -385,17 +406,14 @@ export default function Perfil() {
                           <tr key={sol.id}>
                             <td className="fw-bold">{sol.nome}</td>
                             <td><span className="badge bg-secondary">{sol.tipo}</span></td>
-                            <td className="text-muted small">{sol.email}</td>
+                            <td className="text-muted small">{sol.whatsapp}</td>
                             <td>
-                              <span className={`badge ${sol.status === 'Aprovado' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                              <span className={`badge ${sol.status === 'Aprovado' ? 'bg-success' : sol.status === 'Reprovado' ? 'bg-danger' : 'bg-warning text-dark'}`}>
                                 {sol.status}
                               </span>
                             </td>
                             <td>
-                              <button onClick={() => setSolicitacaoSelecionada(sol)} className="btn btn-sm btn-outline-dark fw-bold rounded-pill me-2">Ver Detalhes</button>
-                              {sol.status !== 'Aprovado' && (
-                                <button onClick={() => aprovarParceiro(sol.id)} className="btn btn-sm btn-success fw-bold rounded-pill">Aprovar</button>
-                              )}
+                              <button onClick={() => setSolicitacaoSelecionada(sol)} className="btn btn-sm btn-outline-dark fw-bold rounded-pill">Ver Perfil Completo</button>
                             </td>
                           </tr>
                         ))}
@@ -415,43 +433,64 @@ export default function Perfil() {
       {/* Modal Visualizar Detalhes da Solicitação (Admin) */}
       {solicitacaoSelecionada && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1050 }}>
-          <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content rounded-4 border-0">
               <div className="modal-header bg-dark text-white rounded-top-4 border-0">
-                <h5 className="fw-bold m-0"><i className="fas fa-envelope-open-text me-2"></i>Detalhes da Solicitação</h5>
+                <h5 className="fw-bold m-0"><i className="fas fa-user-check me-2"></i>Análise de Parceiro</h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setSolicitacaoSelecionada(null)}></button>
               </div>
-              <div className="modal-body p-4">
-                <div className="mb-3">
-                  <span className="d-block small text-muted fw-bold text-uppercase">Parceiro</span>
-                  <span className="fw-bold fs-5 text-dark">{solicitacaoSelecionada.nome}</span>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-6">
-                    <span className="d-block small text-muted fw-bold text-uppercase">E-mail</span>
-                    <span className="text-dark">{solicitacaoSelecionada.email}</span>
+              <div className="modal-body p-4 bg-light">
+                <div className="row g-4">
+                  {/* Dados do Empreendedor */}
+                  <div className="col-md-6">
+                    <div className="bg-white p-3 rounded-4 shadow-sm h-100 border">
+                      <h6 className="fw-bold text-success mb-3 border-bottom pb-2">Dados do Contato</h6>
+                      <p className="mb-1"><span className="text-muted small fw-bold">Responsável:</span> {solicitacaoSelecionada.nome}</p>
+                      <p className="mb-1"><span className="text-muted small fw-bold">E-mail:</span> {solicitacaoSelecionada.email}</p>
+                      <p className="mb-1"><span className="text-muted small fw-bold">WhatsApp:</span> {solicitacaoSelecionada.whatsapp}</p>
+                      <p className="mb-3"><span className="text-muted small fw-bold">Tipo:</span> <span className="badge bg-dark ms-1">{solicitacaoSelecionada.tipo}</span></p>
+                      <p className="small text-muted fst-italic p-2 bg-light rounded border">"{solicitacaoSelecionada.mensagem || 'Sem mensagem extra.'}"</p>
+                    </div>
                   </div>
-                  <div className="col-6">
-                    <span className="d-block small text-muted fw-bold text-uppercase">WhatsApp</span>
-                    <span className="text-dark">{solicitacaoSelecionada.whatsapp || 'Não informado'}</span>
+                  
+                  {/* Prévia do Anúncio */}
+                  <div className="col-md-6">
+                    <div className="bg-white p-3 rounded-4 shadow-sm h-100 border">
+                      <h6 className="fw-bold text-success mb-3 border-bottom pb-2">Prévia do Anúncio Submetido</h6>
+                      {solicitacaoSelecionada.tituloLocal ? (
+                        <>
+                          {solicitacaoSelecionada.imagemLocal && (
+                            <img src={solicitacaoSelecionada.imagemLocal} alt="Preview" className="img-fluid rounded-3 mb-2" style={{height: '100px', width: '100%', objectFit: 'cover'}} />
+                          )}
+                          <h6 className="fw-bold text-dark mt-2 mb-1">{solicitacaoSelecionada.tituloLocal}</h6>
+                          <div className="d-flex justify-content-between mb-2">
+                            <span className="badge bg-light text-dark border"><i className="far fa-clock"></i> {solicitacaoSelecionada.horarioLocal || 'N/A'}</span>
+                            <span className="fw-bold text-success">R$ {solicitacaoSelecionada.precoLocal || '0'}</span>
+                          </div>
+                          <p className="small text-muted" style={{display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>{solicitacaoSelecionada.descricaoLocal}</p>
+                        </>
+                      ) : (
+                        <p className="text-muted small text-center py-4">Este usuário preencheu apenas os dados de contato.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <span className="d-block small text-muted fw-bold text-uppercase">Tipo de Negócio</span>
-                  <span className="badge bg-success">{solicitacaoSelecionada.tipo}</span>
-                </div>
-                <div className="mb-4">
-                  <span className="d-block small text-muted fw-bold text-uppercase mb-2">Mensagem do Parceiro</span>
-                  <div className="bg-light p-3 rounded-3 border text-dark" style={{ whiteSpace: 'pre-wrap' }}>
-                    {solicitacaoSelecionada.mensagem || 'Nenhuma mensagem enviada.'}
-                  </div>
-                </div>
+              </div>
+              
+              {/* Botões de Ação do Admin */}
+              <div className="modal-footer bg-white border-top-0 d-flex justify-content-between p-4 rounded-bottom-4">
+                <button onClick={() => contatarWhatsApp(solicitacaoSelecionada.whatsapp)} className="btn btn-outline-success fw-bold rounded-pill">
+                  <i className="fab fa-whatsapp fs-5 me-2 align-middle"></i> Chamar no Zap
+                </button>
                 
-                {solicitacaoSelecionada.status !== 'Aprovado' && (
-                  <button onClick={() => { aprovarParceiro(solicitacaoSelecionada.id); setSolicitacaoSelecionada(null); }} className="btn btn-success fw-bold w-100 rounded-pill p-3">
-                    <i className="fas fa-check-circle me-2"></i> Aprovar Parceiro
+                <div className="d-flex gap-2">
+                  <button onClick={() => reprovarParceiro(solicitacaoSelecionada.id)} className="btn btn-outline-danger fw-bold rounded-pill px-4" disabled={solicitacaoSelecionada.status === 'Reprovado'}>
+                    <i className="fas fa-times me-1"></i> Reprovar
                   </button>
-                )}
+                  <button onClick={() => aprovarParceiro(solicitacaoSelecionada.id)} className="btn btn-success fw-bold rounded-pill px-4 shadow-sm" disabled={solicitacaoSelecionada.status === 'Aprovado'}>
+                    <i className="fas fa-check me-1"></i> Aprovar Perfil
+                  </button>
+                </div>
               </div>
             </div>
           </div>
