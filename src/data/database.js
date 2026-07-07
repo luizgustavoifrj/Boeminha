@@ -90,7 +90,7 @@ export const atracoesDb = [
   },
   {
     id: "parque-cidade",
-    titulo: "ee da Cidade",
+    titulo: "eeee da Cidade",
     categoria: "natureza",
     tag: "Pôr do Sol",
     subtopicos: ["Ar Livre", "Parapente", "Vista Rio"],
