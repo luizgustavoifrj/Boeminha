@@ -75,7 +75,7 @@ export const atracoesDb = [
   },
   {
     id: "tupinamba",
-    titulo: "Trilha do Tupinambá",
+    titulo: "Trilahaaa do Tupinambá",
     categoria: "natureza",
     tag: "Trilha & Mirante",
     subtopicos: ["Ar Livre", "Pet Friendly", "Mirante Secreto"],
@@ -90,7 +90,7 @@ export const atracoesDb = [
   },
   {
     id: "parque-cidade",
-    titulo: "eeee da Cidade",
+    titulo: "eeeee da Cidade",
     categoria: "natureza",
     tag: "Pôr do Sol",
     subtopicos: ["Ar Livre", "Parapente", "Vista Rio"],
