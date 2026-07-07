@@ -75,7 +75,7 @@ export const atracoesDb = [
   },
   {
     id: "tupinamba",
-    titulo: "Trilhaaa do Tupinambá",
+    titulo: "Trilahaaa do Tupinambá",
     categoria: "natureza",
     tag: "Trilha & Mirante",
     subtopicos: ["Ar Livre", "Pet Friendly", "Mirante Secreto"],
