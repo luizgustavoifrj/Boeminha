@@ -10,7 +10,6 @@ export function ThemeProvider({ children }) {
     setDarkMode(temaSalvo);
   }, []);
 
-  // Quando o tema muda, aplicamos uma classe no <body> inteiro
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add('dark-mode-global');
@@ -28,9 +27,6 @@ export function ThemeProvider({ children }) {
   return (
     <ThemeContext.Provider value={{ darkMode, toggleDarkMode }}>
       
-      {/* O TRATOR DO MODO ESCURO: 
-        Estas regras esmagam qualquer fundo branco ou texto preto teimoso do site inteiro!
-      */}
       <style>
         {`
           /* 1. Fundo geral da página */
@@ -76,8 +72,8 @@ export function ThemeProvider({ children }) {
             color: #aaaaaa !important;
           }
 
-          /* 5. Salva os textos escuros que ficaram invisíveis */
-          body.dark-mode-global .text-dark,
+          /* 5. Salva os textos escuros, MAS IGNORA OS BOTÕES (o segredo está no :not(.btn)) */
+          body.dark-mode-global .text-dark:not(.btn),
           body.dark-mode-global h1, 
           body.dark-mode-global h2, 
           body.dark-mode-global h3, 
@@ -97,10 +93,41 @@ export function ThemeProvider({ children }) {
           body.dark-mode-global hr {
             border-color: #333 !important;
           }
+
+          /* 7. REGRAS DEFINITIVAS PARA OS BOTÕES NO MODO ESCURO */
+          
+          /* Botões Claros: Força a letra a ficar preta para dar leitura */
+          body.dark-mode-global .btn-light {
+            background-color: #f8f9fa !important;
+            color: #121212 !important; 
+            border-color: #f8f9fa !important;
+          }
+          body.dark-mode-global .btn-light:hover {
+            background-color: #e2e6ea !important;
+          }
+          
+          /* Botões de Contorno: Inverte a cor para branco para brilhar no fundo escuro */
+          body.dark-mode-global .btn-outline-dark {
+            color: #f8f9fa !important;
+            border-color: #f8f9fa !important;
+          }
+          body.dark-mode-global .btn-outline-dark:hover {
+            background-color: #f8f9fa !important;
+            color: #121212 !important;
+          }
+          
+          /* Botões Escuros (caso algum sobre): Deixa um cinza super chique */
+          body.dark-mode-global .btn-dark {
+             background-color: #2a2a2a !important;
+             border-color: #444 !important;
+             color: #fff !important;
+          }
+          body.dark-mode-global .btn-dark:hover {
+             background-color: #444 !important;
+          }
         `}
       </style>
 
-      {/* Nossa div base agora obedece o body global */}
       <div style={{ minHeight: '100vh', transition: '0.3s ease' }}>
         {children}
       </div>
