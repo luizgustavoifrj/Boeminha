@@ -14,7 +14,7 @@ import Checkout from './pages/Checkout';
 import Parceiros from './pages/Parceiros';
 import MidiaKit from './pages/MidiaKit';
 import FaleConosco from './pages/FaleConosco';
-
+import Institucional from './pages/Institucional';
 // Importando as páginas das cidades:
 import Niteroi from './pages/cidades/Niteroi';
 import Rio from './pages/cidades/Rio';
@@ -59,6 +59,12 @@ export default function App() {
             <Route path="/faq" element={<Faq />} />
             <Route path="/termos" element={<Termos />} />
             <Route path="/politica" element={<Politica />} />
+
+            <Route path="/sobre-nos" element={<Institucional />} />
+<Route path="/faq" element={<Institucional />} />
+<Route path="/termos" element={<Institucional />} />
+<Route path="/politica" element={<Institucional />} />
+<Route path="/midia-kit" element={<Institucional />} />
           </Routes>
 
           <Footer />
