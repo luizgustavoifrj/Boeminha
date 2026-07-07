@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './ThemeContext'; // <-- 1. IMPORTAMOS O CÉREBRO AQUI!
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -28,37 +30,40 @@ import './index.css';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <div className="d-flex flex-column min-vh-100">
-        <Navbar />
-        
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/explorar" element={<Explorar />} />
-          <Route path="/roteiros" element={<Roteiros />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/perfil" element={<Perfil />} />
-          <Route path="/anuncie" element={<Anuncie />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/parceiros" element={<Parceiros />} />
-          <Route path="/midia-kit" element={<MidiaKit />} />
-          <Route path="/fale-conosco" element={<FaleConosco />} />
+    // 2. O THEMEPROVIDER AGORA ABRAÇA O SITE INTEIRO!
+    <ThemeProvider> 
+      <BrowserRouter>
+        <div className="d-flex flex-column min-vh-100">
+          <Navbar />
           
-          {/* Rotas das Cidades */}
-          <Route path="/cidades/niteroi" element={<Niteroi />} />
-          <Route path="/cidades/rio" element={<Rio />} />
-          <Route path="/cidades/saogoncalo" element={<SaoGoncalo />} />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/explorar" element={<Explorar />} />
+            <Route path="/roteiros" element={<Roteiros />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/anuncie" element={<Anuncie />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/parceiros" element={<Parceiros />} />
+            <Route path="/midia-kit" element={<MidiaKit />} />
+            <Route path="/fale-conosco" element={<FaleConosco />} />
+            
+            {/* Rotas das Cidades */}
+            <Route path="/cidades/niteroi" element={<Niteroi />} />
+            <Route path="/cidades/rio" element={<Rio />} />
+            <Route path="/cidades/saogoncalo" element={<SaoGoncalo />} />
 
-          {/* Rotas do Rodapé */}
-          <Route path="/sobre-nos" element={<SobreNos />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/termos" element={<Termos />} />
-          <Route path="/politica" element={<Politica />} />
-        </Routes>
+            {/* Rotas do Rodapé */}
+            <Route path="/sobre-nos" element={<SobreNos />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/termos" element={<Termos />} />
+            <Route path="/politica" element={<Politica />} />
+          </Routes>
 
-        <Footer />
-      </div>
-    </BrowserRouter>
+          <Footer />
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
