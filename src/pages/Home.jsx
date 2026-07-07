@@ -166,7 +166,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* BENTO GRID (AGORA COM LINKS FUNCIONAIS) */}
+      {/* BENTO GRID (AGORA COM FOTOS HD E TEXTOS PROFISSIONAIS) */}
       <section className="container mb-5" style={{ position: 'relative', zIndex: 1 }}>
         <div className="d-flex align-items-center justify-content-between mb-4">
           <h2 className={`fw-bold m-0 ${darkMode ? 'text-white' : 'text-dark'}`}>Experiências em Destaque</h2>
@@ -174,36 +174,40 @@ export default function Home() {
         </div>
         
         <div className="bento-grid d-grid gap-3" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 220px)' }}>
-          {/* Link para Samba */}
-          <Link to="/explorar?busca=samba" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-star me-1"></i> RECOMENDADO</span>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <p className="small mb-1 text-uppercase text-light opacity-75 fw-bold">Vida Noturna</p>
-              <h3 className="fw-bold mb-0 text-white">Samba da cantareira: Ingressos Abertos</h3>
+          
+          {/* Card 1: Vida Noturna */}
+          <Link to="/explorar?busca=samba" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://images.unsplash.com/photo-1533174000265-e8cb97092147?q=80&w=1000')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold shadow"><i className="fas fa-star me-1"></i> IMPERDÍVEL</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-1 text-uppercase text-warning fw-bold" style={{ letterSpacing: '1px' }}>Vida Noturna</p>
+              <h3 className="fw-bold mb-0 text-white" style={{ fontSize: '1.8rem' }}>O autêntico samba de raiz e a boemia niteroiense</h3>
             </div>
           </Link>
           
-          {/* Link para Botecos */}
-          <Link to="/explorar?busca=boteco" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://conteudo.imguol.com.br/c/entretenimento/d4/2021/02/04/cada-cerveja-tem-um-tipo-especifico-de-copo-para-manter-as-principais-caracteristicas-veja-opcoes-1612483971132_v2_1x1.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-handshake me-1"></i> PARCEIRO</span>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-4 mb-0 text-white">Gastronomia Raiz: Os melhores botecos</h3>
+          {/* Card 2: Gastronomia */}
+          <Link to="/explorar?busca=boteco" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-success text-white position-absolute top-0 start-0 m-3 fw-bold shadow"><i className="fas fa-utensils me-1"></i> GASTRONOMIA</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <h3 className="fw-bold fs-4 mb-0 text-white">Roteiros de sabor: dos botecos clássicos aos bistrôs</h3>
             </div>
           </Link>
 
-          {/* Link para Trilhas */}
-          <Link to="/explorar?busca=trilha" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-5 mb-0 text-white">Trilhas Guiadas</h3>
+          {/* Card 3: Trilhas */}
+          <Link to="/explorar?busca=trilha" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-0 text-uppercase text-success fw-bold" style={{ letterSpacing: '1px' }}>Ecoturismo</p>
+              <h3 className="fw-bold fs-5 mb-0 text-white">Trilhas & Mirantes</h3>
             </div>
           </Link>
 
-          {/* Link para Cultura */}
-          <Link to="/explorar?busca=cultura" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-5 mb-0 text-white">Cultura e Arte</h3>
+          {/* Card 4: Cultura */}
+          <Link to="/explorar?busca=cultura" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-0 text-uppercase text-info fw-bold" style={{ letterSpacing: '1px' }}>Arte</p>
+              <h3 className="fw-bold fs-5 mb-0 text-white">Cultura & História</h3>
             </div>
           </Link>
+          
         </div>
       </section>
 
