@@ -11,8 +11,8 @@ export const atracoesDb = [
     imagem: "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
     galeria: [
       "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Museu_de_Arte_Contempor%C3%A2nea_de_Niter%C3%B3i_02.jpg/1200px-Museu_de_Arte_Contempor%C3%A2nea_de_Niter%C3%B3i_02.jpg",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/MAC_Niter%C3%B3i_-_RJ.jpg/1200px-MAC_Niter%C3%B3i_-_RJ.jpg"
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTugtpzSsR9SlEsTG5CLr5wBUpriFqRaLubscSX7JXXaQ&s=10",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/08/a7/50/b8/museu-de-arte-contemporanea.jpg?w=900&h=500&s=1"
     ],
     patrocinado: false,
     lat: -22.9068, lng: -43.1244,
