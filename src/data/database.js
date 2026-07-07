@@ -32,7 +32,7 @@ export const atracoesDb = [
     preco: 0.00,
     imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5ACo89U-WWlRUngAKgeQMefHaJiIziodv1iSrR7uXcjmkrhHnz52iXFcO&s=10",
     galeria: [
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGNcAfRVjrXWHPQdIg59kLxCJ1jIjfUosvxmyA-BpvswANyz5UFK9vBi3h&s=10",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5ACo89U-WWlRUngAKgeQMefHaJiIziodv1iSrR7uXcjmkrhHnz52iXFcO&s=10",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO8Zc5E08CVp1NFH7AL1rtnsRXwfAWn0tlZoQ-R4hCekznSQoWbpfxHO9U&s=10",
       "https://images.unsplash.com/photo-1531058020387-3be344556be6?q=80&w=1000"
     ],
@@ -98,10 +98,10 @@ export const atracoesDb = [
     subtopicos: ["Ar Livre", "Aventura", "EcoTurismo"],
     descricao: "Uma das trilhas mais recompensadoras do Estado do Rio. A subida pela rocha nua do Costão exige um pouco de fôlego, mas a chegada ao topo é de tirar as palavras. De lá, você tem uma visão panorâmica em 360 graus do Oceano Atlântico, da Praia de Itacoatiara e do contorno das montanhas da Serra da Tiririca. A sensação de sentir a brisa do mar lá do alto é a definição perfeita de liberdade.",
     preco: 0.00,
-    imagem: "https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg",
+    imagem: "https://www.vamostrilhar.com.br//wp-content/uploads/2017/10/Conhe%C3%A7a-tudo-sobre-o-Cost%C3%A3o-do-Itacoatiara-Niter%C3%B3i-RJ-Vamos-Trilhar.webp",
     galeria: [
-      "https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Cost%C3%A3o_de_Itacoatiara.jpg/1200px-Cost%C3%A3o_de_Itacoatiara.jpg",
+      "https://www.vamostrilhar.com.br//wp-content/uploads/2017/10/Conhe%C3%A7a-tudo-sobre-o-Cost%C3%A3o-do-Itacoatiara-Niter%C3%B3i-RJ-Vamos-Trilhar.webp",
+      "https://passagenspromo.com.br/blog/wp-content/uploads/2020/08/costao-de-itacoatiara.jpg",
       "https://images.unsplash.com/photo-1506929562872-bb421503ef21?q=80&w=1000"
     ],
     patrocinado: false,
@@ -121,10 +121,10 @@ export const atracoesDb = [
     subtopicos: ["Ar Livre", "Pet Friendly", "Mirante Secreto"],
     descricao: "O refúgio perfeito para quem quer fugir das rotas turísticas lotadas. Esta trilha cruza um trecho denso e preservado da Mata Atlântica, oferecendo sombra, ar puro e o som constante dos pássaros. O grande prêmio fica por conta dos mirantes naturais escondidos entre as árvores, que revelam ângulos inéditos e exclusivos da Baía de Guanabara. É um trajeto imersivo e revitalizante para o corpo e a mente.",
     preco: 45.00,
-    imagem: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Parque_da_Cidade_em_Niter%C3%B3i.jpg/1200px-Parque_da_Cidade_em_Niter%C3%B3i.jpg",
+    imagem: "https://ogimg.infoglobo.com.br/in/21092571-189-e31/FT1086A/edit-9.jpg",
     galeria: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Parque_da_Cidade_em_Niter%C3%B3i.jpg/1200px-Parque_da_Cidade_em_Niter%C3%B3i.jpg",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1000",
+      "https://ogimg.infoglobo.com.br/in/21092571-189-e31/FT1086A/edit-9.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmdsUMLQ_gcJrExztJM9gq6Fk0cFh-C1hPZBsFoFS0TLGzLtEEHb55jwxL&s=10",
       "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1000"
     ],
     patrocinado: false,
@@ -144,10 +144,10 @@ export const atracoesDb = [
     subtopicos: ["Ar Livre", "Parapente", "Vista Rio"],
     descricao: "Se Niterói tem o apelido de 'Cidade Sorriso', muito se deve à vista deste parque. Localizado a 270 metros de altitude, ele possui duas rampas de voo livre onde dezenas de parapentes colorem o céu todos os dias. No fim de tarde, o gramado fica tomado por grupos de amigos e famílias fazendo piquenique enquanto assistem ao sol se esconder exatamente atrás da silhueta majestosa do Rio de Janeiro. Uma experiência obrigatória.",
     preco: 0.00,
-    imagem: "https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg",
+    imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtsZhf0sg0BcwrL5WVoPNT31dW5sWBiLAYosDqeZxQ_lkIW617zKEkJSk&s=10",
     galeria: [
-      "https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Vista_do_Parque_da_Cidade_em_Niter%C3%B3i.jpg/1200px-Vista_do_Parque_da_Cidade_em_Niter%C3%B3i.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtsZhf0sg0BcwrL5WVoPNT31dW5sWBiLAYosDqeZxQ_lkIW617zKEkJSk&s=10",
+      "https://turistaprofissional.com/wp-content/uploads/2016/04/o-que-ver-em-niteroi.jpg",
       "https://images.unsplash.com/photo-1501504905252-473c47e087f8?q=80&w=1000"
     ],
     patrocinado: false,
@@ -166,10 +166,10 @@ export const atracoesDb = [
     subtopicos: ["Ar Livre", "Sons do Mar", "Fotos"],
     descricao: "Um cantinho de paz estrategicamente posicionado no final da orla. Com uma vista desimpedida para as ilhas da região e a imensidão azul, é o lugar ideal para levar uma cadeira de praia, um bom livro ou apenas uma câmera fotográfica. A brisa salgada e o som ininterrupto das ondas quebrando nas pedras ao redor criam uma atmosfera terapêutica para encerrar qualquer dia com chave de ouro.",
     preco: 0.00,
-    imagem: "https://images.unsplash.com/photo-1444464666168-49b626d49cb4?q=80&w=1000",
+    imagem: "https://media-cdn.tripadvisor.com/media/photo-s/0f/50/2c/17/aerea-do-mirante-de-piratining.jpg",
     galeria: [
-      "https://images.unsplash.com/photo-1444464666168-49b626d49cb4?q=80&w=1000",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Praia_de_Piratininga_-_Niter%C3%B3i.jpg/1200px-Praia_de_Piratininga_-_Niter%C3%B3i.jpg",
+      "https://media-cdn.tripadvisor.com/media/photo-s/0f/50/2c/17/aerea-do-mirante-de-piratining.jpg",
+      "https://www.tripadvisor.com.br/LocationPhotoDirectLink-g303500-d4056721-i256912420-Sossego_Beach-Niteroi_State_of_Rio_de_Janeiro.html",
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000"
     ],
     patrocinado: false,
@@ -193,7 +193,7 @@ export const atracoesDb = [
     imagem: "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
     galeria: [
       "https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg",
-      "https://images.unsplash.com/photo-1533174000265-e8cb97092147?q=80&w=1000",
+      "https://cidadedeniteroi.com/wp-content/uploads/2017/04/docas01-2-768x508.jpg",
       "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000"
     ],
     patrocinado: true,
@@ -324,10 +324,10 @@ export const atracoesDb = [
     subtopicos: ["Brunch Completo", "Instagramável", "Artesanal"],
     descricao: "Se os seus finais de semana pedem uma refeição farta e bonita, a Cassia é o destino certo. Famosa em toda a cidade pelo seu 'Brunch dos Deuses', a mesa é servida com pães de fermentação natural, ovos cremosos, geleias artesanais e charcutaria de primeira linha. A confeitaria de inspiração francesa encanta logo na vitrine, com tartelettes e éclairs impecáveis. O ambiente tem uma estética clara e floral, super instagramável.",
     preco: 0.00,
-    imagem: "https://images.unsplash.com/photo-1495474472204-51ea99282214?q=80&w=1000",
+    imagem: "https://lh3.googleusercontent.com/gps-cs-s/APNQkAE1P1GidXG_ksU1lq2-6ESLNRswEuC3TRvyfHlNjT4To8RtmjPa_LpiL7lQWfxl28UUreJl42BCZ7r0LORKVyy22nICQsbXjglpYI9JnpJNL3vizrvgwySh0WBk1JNxN-Wu6V9c5c64geq1=s1360-w1360-h1020-rw",
     galeria: [
-      "https://images.unsplash.com/photo-1495474472204-51ea99282214?q=80&w=1000",
-      "https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?q=80&w=1000",
+      "https://lh3.googleusercontent.com/gps-cs-s/APNQkAE1P1GidXG_ksU1lq2-6ESLNRswEuC3TRvyfHlNjT4To8RtmjPa_LpiL7lQWfxl28UUreJl42BCZ7r0LORKVyy22nICQsbXjglpYI9JnpJNL3vizrvgwySh0WBk1JNxN-Wu6V9c5c64geq1=s1360-w1360-h1020-rw",
+      "https://colunadogilson.com.br/cac/wp-content/uploads/Cafeteria-Cassia-624x401.jpg",
       "https://images.unsplash.com/photo-1509312946282-e87f54070a2a?q=80&w=1000"
     ],
     patrocinado: false,
