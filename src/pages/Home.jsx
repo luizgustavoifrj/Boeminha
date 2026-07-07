@@ -52,8 +52,15 @@ export default function Home() {
         </div>
       </div>
 
-      <header className="hero-section text-center position-relative mx-3 mb-5 rounded-4 overflow-hidden" style={{ padding: '100px 0', background: '#1b4332', color: 'white' }}>
-        <div className="hero-bg position-absolute top-0 start-0 w-100 h-100" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+      {/* 
+        AQUI ESTAVA O PROBLEMA! 
+        Removi a classe 'overflow-hidden' do <header> para ele parar de "cortar" a lista flutuante. 
+      */}
+      <header className="hero-section text-center position-relative mx-3 mb-5 rounded-4" style={{ padding: '100px 0', background: '#1b4332', color: 'white' }}>
+        
+        {/* Adicionei a classe 'rounded-4' direto no background da imagem para manter a borda curva redondinha */}
+        <div className="hero-bg position-absolute top-0 start-0 w-100 h-100 rounded-4" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+        
         <div className="container hero-content position-relative" style={{ zIndex: 10 }}>
           <h1 className="fw-bold mb-3" style={{ fontSize: '3rem', letterSpacing: '-1px' }}>Descubra a verdadeira Niterói.</h1>
           <p className="lead opacity-75 mx-auto mb-4" style={{ maxWidth: '650px' }}>
@@ -61,7 +68,6 @@ export default function Home() {
           </p>
           
           <div className="search-container mx-auto position-relative" style={{ maxWidth: '600px', zIndex: 1050 }}>
-            {/* O Z-INDEX 1060 AQUI GARANTE QUE A BARRA NUNCA SERÁ COBERTA POR NADA */}
             <div className="search-box bg-white p-2 rounded-pill d-flex shadow position-relative" style={{ zIndex: 1060 }}>
               <input 
                 type="text" 
@@ -79,7 +85,6 @@ export default function Home() {
               </button>
             </div>
             
-            {/* O DROPDOWN INTELIGENTE AGORA COM TOP: 100% PARA DESCER CORRETAMENTE E MAX-HEIGHT PARA ROLAGEM */}
             {mostrarSugestoes && sugestoes.length > 0 && (
               <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
                 {sugestoes.map((sug) => (
