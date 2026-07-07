@@ -26,9 +26,6 @@ export default function Perfil() {
   const [nota, setNota] = useState(5);
   const [comentario, setComentario] = useState('');
 
-  // Novo Estado para o Admin visualizar a mensagem da solicitação
-  const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState(null);
-
   const navigate = useNavigate();
   const diasDaSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 
@@ -46,6 +43,7 @@ export default function Perfil() {
 
   const carregarDados = async (uid, email) => {
     try {
+      // 1. Busca dados do usuário
       const doc = await firestore.collection('usuarios').doc(uid).get();
       let dadosUsuario = { nome: email.split('@')[0], tipo: 'turista', fotoUrl: '', biografia: '', diasDisponiveis: [] };
       if (doc.exists) dadosUsuario = { ...dadosUsuario, ...doc.data() };
@@ -53,6 +51,7 @@ export default function Perfil() {
       setDadosDb(dadosUsuario);
       setPerfilForm(dadosUsuario);
 
+      // 2. Carrega dependendo do tipo de perfil
       if (dadosUsuario.tipo === 'turista') {
         const pedidosSnap = await firestore.collection('usuarios').doc(uid).collection('pedidos').orderBy('dataCompra', 'desc').get();
         setPedidos(pedidosSnap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -77,6 +76,7 @@ export default function Perfil() {
     navigate('/login');
   };
 
+  // ================= FUNÇÕES GERAIS =================
   const salvarPerfil = async () => {
     try {
       await firestore.collection('usuarios').doc(user.uid).set(perfilForm, { merge: true });
@@ -97,6 +97,7 @@ export default function Perfil() {
     }
   };
 
+  // ================= FUNÇÕES DO GUIA =================
   const abrirNovoRoteiro = () => {
     setEditandoRoteiroId(null);
     setNovoRoteiro({ titulo: '', descricao: '', preco: '', duracao: '', horario: '', imagemUrl: '' });
@@ -122,10 +123,12 @@ export default function Perfil() {
       };
 
       if (editandoRoteiroId) {
+        // Atualiza existente
         await firestore.collection('roteiros').doc(editandoRoteiroId).update(roteiroFinal);
         setMeusRoteiros(meusRoteiros.map(r => r.id === editandoRoteiroId ? { id: editandoRoteiroId, ...roteiroFinal } : r));
         alert('Roteiro atualizado!');
       } else {
+        // Cria novo
         roteiroFinal.dataCriacao = new Date().toISOString();
         const docRef = await firestore.collection('roteiros').add(roteiroFinal);
         setMeusRoteiros([{ id: docRef.id, ...roteiroFinal }, ...meusRoteiros]);
@@ -144,6 +147,7 @@ export default function Perfil() {
     }
   };
 
+  // ================= FUNÇÕES DO ADMIN =================
   const aprovarParceiro = async (id) => {
     try {
       await firestore.collection('solicitacoes_parceria').doc(id).update({ status: 'Aprovado' });
@@ -154,6 +158,7 @@ export default function Perfil() {
     }
   };
 
+  // ================= RENDERIZAÇÃO =================
   if (loading) return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}><div className="spinner-border text-success"></div></div>;
 
   const proximosEventos = pedidos.filter(p => p.dataAgendada);
@@ -162,6 +167,7 @@ export default function Perfil() {
   return (
     <div style={{ paddingTop: '76px', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       
+      {/* CABEÇALHO GERAL DO PERFIL */}
       <header className="bg-white border-bottom py-5 mb-4 shadow-sm">
         <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
           <div className="d-flex align-items-center">
@@ -189,7 +195,9 @@ export default function Perfil() {
 
       <main className="container mb-5">
 
-        {/* ==================== TURISTA ==================== */}
+        {/* ============================================================ */}
+        {/* INTERFACE DO TURISTA */}
+        {/* ============================================================ */}
         {(!dadosDb?.tipo || dadosDb.tipo === 'turista') && (
           <div className="row g-4">
             <div className="col-lg-5">
@@ -238,7 +246,9 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* ==================== GUIA ==================== */}
+        {/* ============================================================ */}
+        {/* INTERFACE DO GUIA */}
+        {/* ============================================================ */}
         {dadosDb?.tipo === 'guia' && (
           <div className="row g-4">
             <div className="col-lg-4">
@@ -294,7 +304,9 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* ==================== DONO ==================== */}
+        {/* ============================================================ */}
+        {/* INTERFACE DO BUSINESS (DONO) */}
+        {/* ============================================================ */}
         {dadosDb?.tipo === 'dono' && (
           <div className="row g-4">
             <div className="col-12">
@@ -328,10 +340,64 @@ export default function Perfil() {
                 </div>
               </div>
             </div>
+            <div className="col-lg-6">
+              <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                <h5 className="fw-bold mb-3"><i className="fas fa-store text-success me-2"></i>Informações da Página</h5>
+                <p className="small text-muted mb-4">Mantenha as informações do seu estabelecimento atualizadas para os turistas.</p>
+                
+                <div className="mb-3">
+                  <label className="small fw-bold text-muted">Nome do Estabelecimento</label>
+                  <input type="text" className="form-control bg-light" defaultValue={dadosDb.nome} />
+                </div>
+                <div className="mb-3">
+                  <label className="small fw-bold text-muted">Categoria Principal</label>
+                  <select className="form-select bg-light">
+                    <option>Bar & Pub</option>
+                    <option>Restaurante</option>
+                    <option>Casa de Show</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="small fw-bold text-muted">Tags (Comodidades)</label>
+                  <div className="d-flex gap-2 flex-wrap">
+                    <span className="badge bg-success bg-opacity-10 text-success border-0 px-3 py-2">Pet Friendly <i className="fas fa-times ms-2" style={{cursor:'pointer'}}></i></span>
+                    <span className="badge bg-success bg-opacity-10 text-success border-0 px-3 py-2">Música ao Vivo <i className="fas fa-times ms-2" style={{cursor:'pointer'}}></i></span>
+                    <span className="badge bg-light text-dark border px-3 py-2" style={{cursor:'pointer'}}><i className="fas fa-plus me-1"></i> Adicionar Tag</span>
+                  </div>
+                </div>
+                <button className="btn btn-success fw-bold w-100 rounded-pill mt-auto">Atualizar Página do Local</button>
+              </div>
+            </div>
+            <div className="col-lg-6">
+              <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="fw-bold m-0"><i className="fas fa-ticket-alt text-success me-2"></i>Gerador de Cupons</h5>
+                  <span className="badge bg-danger">NOVO</span>
+                </div>
+                <p className="small text-muted mb-4">Crie cupons de desconto exclusivos para os usuários do Boeminha.</p>
+                
+                <div className="bg-light p-4 rounded-3 border border-dashed mb-4 text-center">
+                  <h3 className="fw-bold text-dark text-uppercase letter-spacing" style={{ letterSpacing: '3px' }}>BOEMINHA10</h3>
+                  <p className="small text-success fw-bold mb-0">10% OFF • Válido até 30/07</p>
+                </div>
+
+                <div className="row g-2 mb-3">
+                  <div className="col-8">
+                    <input type="text" className="form-control bg-light" placeholder="Nome do Cupom" />
+                  </div>
+                  <div className="col-4">
+                    <input type="text" className="form-control bg-light" placeholder="% OFF" />
+                  </div>
+                </div>
+                <button className="btn btn-outline-dark fw-bold w-100 rounded-pill mt-auto"><i className="fas fa-plus me-2"></i>Criar Nova Promoção</button>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* ==================== ADMIN ==================== */}
+        {/* ============================================================ */}
+        {/* INTERFACE DO ADMIN */}
+        {/* ============================================================ */}
         {dadosDb?.tipo === 'admin' && (
           <div className="row g-4">
             <div className="col-12">
@@ -392,7 +458,6 @@ export default function Perfil() {
                               </span>
                             </td>
                             <td>
-                              <button onClick={() => setSolicitacaoSelecionada(sol)} className="btn btn-sm btn-outline-dark fw-bold rounded-pill me-2">Ver Detalhes</button>
                               {sol.status !== 'Aprovado' && (
                                 <button onClick={() => aprovarParceiro(sol.id)} className="btn btn-sm btn-success fw-bold rounded-pill">Aprovar</button>
                               )}
@@ -411,52 +476,6 @@ export default function Perfil() {
       </main>
 
       {/* ================= MODAIS ================= */}
-
-      {/* Modal Visualizar Detalhes da Solicitação (Admin) */}
-      {solicitacaoSelecionada && (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1050 }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content rounded-4 border-0">
-              <div className="modal-header bg-dark text-white rounded-top-4 border-0">
-                <h5 className="fw-bold m-0"><i className="fas fa-envelope-open-text me-2"></i>Detalhes da Solicitação</h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setSolicitacaoSelecionada(null)}></button>
-              </div>
-              <div className="modal-body p-4">
-                <div className="mb-3">
-                  <span className="d-block small text-muted fw-bold text-uppercase">Parceiro</span>
-                  <span className="fw-bold fs-5 text-dark">{solicitacaoSelecionada.nome}</span>
-                </div>
-                <div className="row mb-3">
-                  <div className="col-6">
-                    <span className="d-block small text-muted fw-bold text-uppercase">E-mail</span>
-                    <span className="text-dark">{solicitacaoSelecionada.email}</span>
-                  </div>
-                  <div className="col-6">
-                    <span className="d-block small text-muted fw-bold text-uppercase">WhatsApp</span>
-                    <span className="text-dark">{solicitacaoSelecionada.whatsapp || 'Não informado'}</span>
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <span className="d-block small text-muted fw-bold text-uppercase">Tipo de Negócio</span>
-                  <span className="badge bg-success">{solicitacaoSelecionada.tipo}</span>
-                </div>
-                <div className="mb-4">
-                  <span className="d-block small text-muted fw-bold text-uppercase mb-2">Mensagem do Parceiro</span>
-                  <div className="bg-light p-3 rounded-3 border text-dark" style={{ whiteSpace: 'pre-wrap' }}>
-                    {solicitacaoSelecionada.mensagem || 'Nenhuma mensagem enviada.'}
-                  </div>
-                </div>
-                
-                {solicitacaoSelecionada.status !== 'Aprovado' && (
-                  <button onClick={() => { aprovarParceiro(solicitacaoSelecionada.id); setSolicitacaoSelecionada(null); }} className="btn btn-success fw-bold w-100 rounded-pill p-3">
-                    <i className="fas fa-check-circle me-2"></i> Aprovar Parceiro
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal Editar Perfil (Comum a Todos) */}
       {editandoPerfil && (
