@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { atracoesDb } from '../data/database'; // Importando do arquivo central!
+import { atracoesDb } from '../data/database';
 
 export default function Explorar() {
   const [atracoes, setAtracoes] = useState(atracoesDb);
@@ -45,14 +45,16 @@ export default function Explorar() {
         id: local.id,
         titulo: local.titulo,
         imagem: local.imagem,
-        preco: local.preco, // Como já é número, passa direto! Matemático e limpo.
+        preco: local.preco,
         qtd: 1
       });
     }
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // MAPA COM RECONSTRUÇÃO CONTRA CACHE
+  // ======================================================================
+  // MAPA COM BALÃOZINHO (POPUP) RICO EM DETALHES!
+  // ======================================================================
   useEffect(() => {
     const container = document.getElementById('map-container');
     if (!container) return;
@@ -109,12 +111,42 @@ export default function Explorar() {
       });
     };
 
+    // Montando os pinos e os balões (popups) visuais
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
         const iconePronto = obterPinoModerno(attr.categoria, filtroAtivo === 'favoritos');
+        
+        // A MÁGICA DO NOVO POPUP: HTML puro sendo injetado com a foto e o botão!
+        const popupHTML = `
+          <div style="width: 170px; text-align: center; font-family: 'Inter', sans-serif;">
+            <div style="width: 100%; height: 100px; background-image: url('${attr.imagem}'); background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+            <h6 style="margin: 0 0 4px 0; font-weight: 800; font-size: 14px; color: #212529;">${attr.titulo}</h6>
+            <span style="display: inline-block; padding: 2px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 12px; font-size: 10px; color: #6c757d; margin-bottom: 10px;">
+              ${attr.tag}
+            </span>
+            <button class="btn btn-success btn-popup-detalhes" data-id="${attr.id}" style="width: 100%; font-size: 12px; font-weight: bold; border-radius: 20px; padding: 6px 0;">
+              Ver Detalhes
+            </button>
+          </div>
+        `;
+
         L.marker([attr.lat, attr.lng], { icon: iconePronto })
-         .bindPopup(`<b>${attr.titulo}</b>`)
+         .bindPopup(popupHTML)
          .addTo(markersLayer);
+      }
+    });
+
+    // O TRUQUE: Toda vez que um balãozinho abrir no mapa, ativamos o clique do botão dele!
+    mapa.on('popupopen', () => {
+      const btn = document.querySelector('.btn-popup-detalhes');
+      if (btn) {
+        btn.onclick = () => {
+          const localId = btn.getAttribute('data-id');
+          const local = atracoes.find(a => a.id === localId);
+          if (local) {
+            setLocalSelecionado(local); // Abre a janela de detalhes gigante!
+          }
+        };
       }
     });
 
@@ -127,6 +159,7 @@ export default function Explorar() {
       mapa.remove();
     };
   }, [atracoes, filtroAtivo]); 
+  // ======================================================================
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -180,6 +213,9 @@ export default function Explorar() {
 
           .btn-cat-favoritos { color: #9b59b6; border: 2px solid #9b59b6; background: transparent; }
           .btn-cat-favoritos:hover, .btn-cat-favoritos.active { background-color: #9b59b6; color: white; }
+          
+          /* Ajuste sutil para o balão do Leaflet ficar mais elegante */
+          .leaflet-popup-content { margin: 12px 14px !important; line-height: 1.3 !important; }
         `}
       </style>
 
@@ -254,7 +290,6 @@ export default function Explorar() {
                     <h5 className="fw-bold">{attr.titulo}</h5>
                     <p className="text-muted small flex-grow-1">{attr.descricao}</p>
                     <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-                      {/* FORMATAÇÃO DO PREÇO NUMÉRICO NOS CARDS */}
                       <span className="fw-bold text-success">
                         {attr.preco === 0 ? 'Gratuito' : `R$ ${attr.preco.toFixed(2).replace('.', ',')}`}
                       </span>
@@ -277,7 +312,6 @@ export default function Explorar() {
         </div>
       </main>
 
-      {/* JANELA MODAL ATUALIZADA */}
       {localSelecionado && (
         <div 
           onClick={() => setLocalSelecionado(null)}
@@ -312,7 +346,6 @@ export default function Explorar() {
               <span className="badge bg-light text-dark mb-2">{localSelecionado.tag}</span>
               <h3 className="fw-bold mb-1">{localSelecionado.titulo}</h3>
               
-              {/* EXIBIÇÃO DOS SUBTÓPICOS DO NOVO BANCO */}
               <div className="mb-3 d-flex gap-1 flex-wrap">
                 {localSelecionado.subtopicos?.map((sub, i) => (
                   <span key={i} className="badge bg-secondary opacity-75" style={{ fontSize: '0.7rem' }}>{sub}</span>
@@ -335,7 +368,6 @@ export default function Explorar() {
                   <span className="text-dark" style={{ fontSize: '0.9rem', lineHeight: '1.4' }}><strong>Endereço:</strong> {localSelecionado.endereco}</span>
                 </div>
 
-                {/* EXIBIÇÃO DO GUIA CASO EXISTA */}
                 {localSelecionado.guia && (
                   <div className="d-flex align-items-center mt-3 pt-3 border-top" style={{ borderColor: '#ddd !important' }}>
                     <img src={localSelecionado.guia.foto} alt={localSelecionado.guia.nome} className="rounded-circle me-3" style={{ width: '36px', height: '36px', objectFit: 'cover' }} />
