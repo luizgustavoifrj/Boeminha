@@ -1,13 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { atracoesDb } from '../data/database';
+import { firestore } from '../services/firebase';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sugestoes, setSugestoes] = useState([]);
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   
+  // Estado para puxar os anúncios reais cadastrados pelos parceiros no banco de dados
+  const [anuncios, setAnuncios] = useState([]);
+  
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const buscarAnuncios = async () => {
+      try {
+        const snapshot = await firestore.collection('anuncios_patrocinados').where('status', '==', 'Ativo').get();
+        const lista = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setAnuncios(lista);
+      } catch (error) {
+        console.error("Erro ao buscar anúncios patrocinados:", error);
+      }
+    };
+    buscarAnuncios();
+  }, []);
 
   // LÓGICA DE AUTOCOMPLETE INTELIGENTE
   const handleSearchInput = (e) => {
@@ -44,21 +61,52 @@ export default function Home() {
     }
   };
 
+  const anunciosTopo = anuncios.slice(0, 3);
+  const anunciosRestantes = anuncios.slice(3, 9);
+
   return (
     <div style={{ paddingTop: '76px' }}>
+      
+      {/* ESPAÇO PUBLICITÁRIO FIXO / TOPO */}
       <div className="container">
         <div className="ad-banner-top bg-white border border-dashed rounded-3 d-flex align-items-center justify-content-center text-muted text-uppercase" style={{ height: '90px', margin: '20px auto', maxWidth: '1200px', letterSpacing: '2px', fontSize: '0.75rem' }}>
           <i className="fas fa-bullhorn me-2"></i> Espaço Publicitário (728x90)
         </div>
       </div>
 
-      {/* 
-        AQUI ESTAVA O PROBLEMA! 
-        Removi a classe 'overflow-hidden' do <header> para ele parar de "cortar" a lista flutuante. 
-      */}
+      {/* CARROSSEL DINÂMICO DE ANÚNCIOS DO SISTEMA (RODA EM LOOP SE HOUVER MAIS DE UM) */}
+      {anunciosTopo.length > 0 && (
+        <div className="container mb-4" style={{ maxWidth: '1200px' }}>
+          <div id="carouselPatrocinadoHome" className="carousel slide shadow-sm rounded-4 overflow-hidden bg-white border" data-bs-ride="carousel" data-bs-interval="4000">
+            <div className="carousel-inner">
+              {anunciosTopo.map((anuncio, idx) => (
+                <div className={`carousel-item ${idx === 0 ? 'active' : ''}`} key={anuncio.id}>
+                  <a href={anuncio.link} target="_blank" rel="noreferrer" className="d-block position-relative text-decoration-none">
+                    <img src={anuncio.imagemUrl} className="d-block w-100" style={{ height: '150px', objectFit: 'cover' }} alt={anuncio.titulo} />
+                    <div className="position-absolute bottom-0 start-0 w-100 p-2 text-white bg-dark bg-opacity-75 d-flex justify-content-between align-items-center px-3 small">
+                      <span className="badge bg-warning text-dark fw-bold">PATROCINADO BUSINESS</span>
+                      <span className="fw-bold text-truncate ms-2 text-white">{anuncio.titulo}</span>
+                    </div>
+                  </a>
+                </div>
+              ))}
+            </div>
+            {anunciosTopo.length > 1 && (
+              <>
+                <button className="carousel-control-prev" type="button" data-bs-target="#carouselPatrocinadoHome" data-bs-slide="prev">
+                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                <button className="carousel-control-next" type="button" data-bs-target="#carouselPatrocinadoHome" data-bs-slide="next">
+                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* HEADER HERO SECTION */}
       <header className="hero-section text-center position-relative mx-3 mb-5 rounded-4" style={{ padding: '100px 0', background: '#1b4332', color: 'white' }}>
-        
-        {/* Adicionei a classe 'rounded-4' direto no background da imagem para manter a borda curva redondinha */}
         <div className="hero-bg position-absolute top-0 start-0 w-100 h-100 rounded-4" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
         
         <div className="container hero-content position-relative" style={{ zIndex: 10 }}>
@@ -86,7 +134,7 @@ export default function Home() {
             </div>
             
             {mostrarSugestoes && sugestoes.length > 0 && (
-              <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
+              <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2 text-start" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
                 {sugestoes.map((sug) => (
                   <div 
                     key={sug.id} 
@@ -116,6 +164,7 @@ export default function Home() {
         </div>
       </header>
 
+      {/* BENTO GRID ORIGINAL */}
       <section className="container mb-5" style={{ position: 'relative', zIndex: 1 }}>
         <div className="d-flex align-items-center justify-content-between mb-4">
           <h2 className="fw-bold m-0 text-dark">Experiências em Destaque</h2>
@@ -152,6 +201,56 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ESPAÇO PUBLICITÁRIO EXTRAS / VITRINE DE PATROCINADOS DO MEIO */}
+      {anunciosRestantes.length > 0 && (
+        <section className="container mb-5">
+          <div className="bg-light p-4 rounded-4 border">
+            <h5 className="fw-bold text-dark mb-3"><i className="fas fa-bullhorn text-success me-2"></i>Destaques da Comunidade Business</h5>
+            <div className="row g-3">
+              {anunciosRestantes.map(anuncio => (
+                <div className="col-md-4" key={anuncio.id}>
+                  <a href={anuncio.link} target="_blank" rel="noreferrer" className="card border-0 shadow-sm rounded-3 overflow-hidden text-decoration-none h-100 custom-card-hover">
+                    <img src={anuncio.imagemUrl} alt={anuncio.titulo} style={{ height: '100px', objectFit: 'cover' }} />
+                    <div className="p-2 small fw-bold text-dark text-center text-truncate bg-white">{anuncio.titulo}</div>
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SEÇÃO DE CATEGORIAS (BASEADA NO DESIGN DE image_adbe90.png) */}
+      <section className="container my-5 py-4 text-center">
+        <h2 className="fw-bold text-dark mb-1">Explorando por Categorias</h2>
+        <p className="text-muted mb-5">Tudo o que Niterói tem para oferecer na palma da sua mão.</p>
+        
+        <div className="row g-4">
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-beer"></i></div>
+              <h5 className="fw-bold text-dark">Bares & Botequim</h5>
+              <p className="text-muted small m-0">Os melhores locais para curtir a noite boemia.</p>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-map-marked-alt"></i></div>
+              <h5 className="fw-bold text-dark">Roteiros Exclusivos</h5>
+              <p className="text-muted small m-0">Passeios guiados por especialistas locais.</p>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-store"></i></div>
+              <h5 className="fw-bold text-dark">Parceiros Business</h5>
+              <p className="text-muted small m-0">Estabelecimentos verificados e com descontos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION BUSINESS ORIGINAL */}
       <section className="business-section bg-white border-top py-5 mt-5">
         <div className="container text-center py-4">
           <div className="glass-card mx-auto bg-light rounded-4 p-5 border" style={{ maxWidth: '850px' }}>
@@ -166,6 +265,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .custom-card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+      `}} />
     </div>
   );
 }

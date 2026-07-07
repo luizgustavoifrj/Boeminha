@@ -8,11 +8,11 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true);
 
   // Estados por tipo de usuário
-  const [pedidos, setPedidos] = useState([]); // Turista
-  const [meusRoteiros, setMeusRoteiros] = useState([]); // Guia
-  const [solicitacoes, setSolicitacoes] = useState([]); // Admin
+  const [pedidos, setPedidos] = useState([]); 
+  const [meusRoteiros, setMeusRoteiros] = useState([]); 
+  const [solicitacoes, setSolicitacoes] = useState([]); 
 
-  // Estados de Edição de Perfil (Geral)
+  // Estados de Edição de Perfil
   const [editandoPerfil, setEditandoPerfil] = useState(false);
   const [perfilForm, setPerfilForm] = useState({ nome: '', fotoUrl: '', biografia: '', diasDisponiveis: [] });
 
@@ -26,8 +26,13 @@ export default function Perfil() {
   const [nota, setNota] = useState(5);
   const [comentario, setComentario] = useState('');
 
-  // Novo Estado para o Admin visualizar a mensagem da solicitação
+  // Estados para Admin
   const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState(null);
+
+  // Estados para Anúncio (Business/Dono)
+  const [modalAnuncio, setModalAnuncio] = useState(false);
+  const [etapaAnuncio, setEtapaAnuncio] = useState(1);
+  const [formAnuncio, setFormAnuncio] = useState({ titulo: '', imagemUrl: '', link: '' });
 
   const navigate = useNavigate();
   const diasDaSemana = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
@@ -56,12 +61,10 @@ export default function Perfil() {
       if (dadosUsuario.tipo === 'turista') {
         const pedidosSnap = await firestore.collection('usuarios').doc(uid).collection('pedidos').orderBy('dataCompra', 'desc').get();
         setPedidos(pedidosSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } 
-      else if (dadosUsuario.tipo === 'guia') {
+      } else if (dadosUsuario.tipo === 'guia') {
         const roteirosSnap = await firestore.collection('roteiros').where('guiaId', '==', uid).get();
         setMeusRoteiros(roteirosSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      }
-      else if (dadosUsuario.tipo === 'admin') {
+      } else if (dadosUsuario.tipo === 'admin') {
         const solSnap = await firestore.collection('solicitacoes_parceria').orderBy('dataEnvio', 'desc').get();
         setSolicitacoes(solSnap.docs.map(d => ({ id: d.id, ...d.data() })));
       }
@@ -122,7 +125,7 @@ export default function Perfil() {
 
   const contatarWhatsApp = (numero) => {
     if (!numero) return;
-    const numeroLimpo = numero.replace(/\D/g, ''); // Remove parênteses e traços
+    const numeroLimpo = numero.replace(/\D/g, '');
     window.open(`https://wa.me/55${numeroLimpo}`, '_blank');
   };
 
@@ -174,6 +177,26 @@ export default function Perfil() {
     }
   };
 
+  // --- FUNÇÕES BUSINESS / DONO ---
+  const processarPagamentoAnuncio = async (e) => {
+    e.preventDefault();
+    try {
+      await firestore.collection('anuncios_patrocinados').add({
+        ...formAnuncio,
+        donoId: user.uid,
+        donoNome: dadosDb.nome,
+        dataCriacao: new Date().toISOString(),
+        status: 'Ativo'
+      });
+      alert('Pagamento aprovado! Seu anúncio já está rodando na página principal.');
+      setModalAnuncio(false);
+      setEtapaAnuncio(1);
+      setFormAnuncio({ titulo: '', imagemUrl: '', link: '' });
+    } catch (error) {
+      alert('Erro ao processar anúncio.');
+    }
+  };
+
   if (loading) return <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}><div className="spinner-border text-success"></div></div>;
 
   const proximosEventos = pedidos.filter(p => p.dataAgendada);
@@ -202,8 +225,8 @@ export default function Perfil() {
             </div>
           </div>
           <div className="d-flex gap-2">
-            <button onClick={() => setEditandoPerfil(true)} className="btn btn-outline-success fw-bold rounded-pill px-4"><i className="fas fa-cog me-2"></i>Configurações</button>
-            <button onClick={handleLogout} className="btn btn-outline-danger fw-bold rounded-pill px-4"><i className="fas fa-sign-out-alt"></i> Sair</button>
+            <button onClick={() => setEditandoPerfil(true)} className="btn btn-outline-success fw-bold rounded-pill px-4">Configurações</button>
+            <button onClick={handleLogout} className="btn btn-outline-danger fw-bold rounded-pill px-4">Sair</button>
           </div>
         </div>
       </header>
@@ -226,7 +249,7 @@ export default function Perfil() {
                   <div key={pedido.id} className="card border-0 shadow-sm rounded-4 p-3 mb-3" style={{ borderLeft: '5px solid #2d6a4f !important' }}>
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
-                        <h6 className="fw-bold mb-1 text-dark">{pedido.itens?.[0]?.titulo || 'Ingresso Boeminha'}</h6>
+                        <h6 className="fw-bold mb-1 text-dark">{pedido.itens?.[0]?.titulo || 'Ingresso'}</h6>
                         <span className="badge bg-light text-dark border mb-2"><i className="far fa-calendar-alt me-1"></i> {pedido.dataAgendada}</span>
                         <p className="small text-muted m-0">Cód: #{pedido.id.substring(0,6)}</p>
                       </div>
@@ -315,38 +338,43 @@ export default function Perfil() {
           </div>
         )}
 
-        {/* ==================== DONO ==================== */}
+        {/* ==================== DONO / BUSINESS ==================== */}
         {dadosDb?.tipo === 'dono' && (
           <div className="row g-4">
-            <div className="col-12">
-              <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div className="col-lg-8">
+              <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
                 <h4 className="fw-bold text-dark mb-4"><i className="fas fa-chart-line text-success me-2"></i>Visão Geral do Seu Negócio</h4>
                 <div className="row g-3 text-center">
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <div className="p-3 bg-light rounded-3 border">
                       <div className="fs-2 fw-bold text-success">3.402</div>
                       <div className="small text-muted fw-bold text-uppercase">Visualizações</div>
                     </div>
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <div className="p-3 bg-light rounded-3 border">
                       <div className="fs-2 fw-bold text-success">289</div>
                       <div className="small text-muted fw-bold text-uppercase">Cliques no Site</div>
                     </div>
                   </div>
-                  <div className="col-md-3">
-                    <div className="p-3 bg-light rounded-3 border">
-                      <div className="fs-2 fw-bold text-success">45</div>
-                      <div className="small text-muted fw-bold text-uppercase">Avaliações (Mês)</div>
-                    </div>
-                  </div>
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <div className="p-3 bg-dark text-white rounded-3 border border-dark">
                       <div className="fs-2 fw-bold text-warning">4.8 <i className="fas fa-star fs-5"></i></div>
                       <div className="small text-white-50 fw-bold text-uppercase">Nota Média</div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div className="col-lg-4">
+              <div className="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 text-center d-flex flex-column justify-content-center" style={{ border: '2px dashed #2d6a4f' }}>
+                <i className="fas fa-bullhorn text-success fs-1 mb-3"></i>
+                <h5 className="fw-bold text-dark mb-2">Espaço Patrocinado</h5>
+                <p className="text-muted small mb-4">Destaque o seu estabelecimento na página principal do Boeminha.</p>
+                <button onClick={() => setModalAnuncio(true)} className="btn btn-success fw-bold rounded-pill w-100">
+                  Criar Anúncio (R$ 49,90/mês)
+                </button>
               </div>
             </div>
           </div>
@@ -430,6 +458,60 @@ export default function Perfil() {
 
       {/* ================= MODAIS ================= */}
 
+      {/* Modal Criar Anúncio (Business) */}
+      {modalAnuncio && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1050 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content rounded-4 border-0">
+              <div className="modal-header bg-dark text-white border-0 rounded-top-4">
+                <h5 className="fw-bold m-0"><i className="fas fa-bullhorn me-2"></i>Impulsionar Negócio</h5>
+                <button type="button" className="btn-close btn-close-white" onClick={() => { setModalAnuncio(false); setEtapaAnuncio(1); }}></button>
+              </div>
+              <div className="modal-body p-4">
+                
+                {etapaAnuncio === 1 ? (
+                  <form onSubmit={(e) => { e.preventDefault(); setEtapaAnuncio(2); }}>
+                    <div className="mb-3">
+                      <label className="form-label small fw-bold text-muted">Título do Anúncio</label>
+                      <input type="text" className="form-control bg-light p-3" required maxLength="50" placeholder="Ex: Prove o melhor chopp!" value={formAnuncio.titulo} onChange={e => setFormAnuncio({...formAnuncio, titulo: e.target.value})} />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label small fw-bold text-muted">URL da Imagem</label>
+                      <input type="url" className="form-control bg-light p-3" required placeholder="https://..." value={formAnuncio.imagemUrl} onChange={e => setFormAnuncio({...formAnuncio, imagemUrl: e.target.value})} />
+                    </div>
+                    <div className="mb-4">
+                      <label className="form-label small fw-bold text-muted">Link de Destino</label>
+                      <input type="url" className="form-control bg-light p-3" required value={formAnuncio.link} onChange={e => setFormAnuncio({...formAnuncio, link: e.target.value})} />
+                    </div>
+                    <button type="submit" className="btn btn-dark fw-bold w-100 rounded-pill p-3">Ir para Pagamento</button>
+                  </form>
+                ) : (
+                  <form onSubmit={processarPagamentoAnuncio}>
+                    <div className="bg-light p-3 rounded-3 border mb-4 text-center">
+                      <span className="d-block small text-muted fw-bold text-uppercase mb-1">Plano Mensal</span>
+                      <h3 className="fw-bold text-success m-0">R$ 49,90<span className="fs-6 text-muted">/mês</span></h3>
+                    </div>
+                    <h6 className="fw-bold text-dark mb-3">Dados do Cartão</h6>
+                    <div className="mb-3">
+                      <input type="text" className="form-control bg-light p-3" placeholder="Número do Cartão" required />
+                    </div>
+                    <div className="row g-2 mb-4">
+                      <div className="col-6"><input type="text" className="form-control bg-light p-3" placeholder="MM/AA" required /></div>
+                      <div className="col-6"><input type="text" className="form-control bg-light p-3" placeholder="CVV" required /></div>
+                    </div>
+                    <div className="d-flex gap-2">
+                      <button type="button" onClick={() => setEtapaAnuncio(1)} className="btn btn-outline-secondary fw-bold rounded-pill px-4">Voltar</button>
+                      <button type="submit" className="btn btn-success fw-bold w-100 rounded-pill p-3"><i className="fas fa-check me-2"></i>Assinar e Publicar</button>
+                    </div>
+                  </form>
+                )}
+
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal Visualizar Detalhes da Solicitação (Admin) */}
       {solicitacaoSelecionada && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1050 }}>
@@ -441,7 +523,6 @@ export default function Perfil() {
               </div>
               <div className="modal-body p-4 bg-light">
                 <div className="row g-4">
-                  {/* Dados do Empreendedor */}
                   <div className="col-md-6">
                     <div className="bg-white p-3 rounded-4 shadow-sm h-100 border">
                       <h6 className="fw-bold text-success mb-3 border-bottom pb-2">Dados do Contato</h6>
@@ -453,7 +534,6 @@ export default function Perfil() {
                     </div>
                   </div>
                   
-                  {/* Prévia do Anúncio */}
                   <div className="col-md-6">
                     <div className="bg-white p-3 rounded-4 shadow-sm h-100 border">
                       <h6 className="fw-bold text-success mb-3 border-bottom pb-2">Prévia do Anúncio Submetido</h6>
@@ -477,12 +557,10 @@ export default function Perfil() {
                 </div>
               </div>
               
-              {/* Botões de Ação do Admin */}
               <div className="modal-footer bg-white border-top-0 d-flex justify-content-between p-4 rounded-bottom-4">
                 <button onClick={() => contatarWhatsApp(solicitacaoSelecionada.whatsapp)} className="btn btn-outline-success fw-bold rounded-pill">
                   <i className="fab fa-whatsapp fs-5 me-2 align-middle"></i> Chamar no Zap
                 </button>
-                
                 <div className="d-flex gap-2">
                   <button onClick={() => reprovarParceiro(solicitacaoSelecionada.id)} className="btn btn-outline-danger fw-bold rounded-pill px-4" disabled={solicitacaoSelecionada.status === 'Reprovado'}>
                     <i className="fas fa-times me-1"></i> Reprovar
@@ -520,79 +598,6 @@ export default function Perfil() {
                   <textarea className="form-control bg-light p-3" rows="3" value={perfilForm.biografia} onChange={e => setPerfilForm({...perfilForm, biografia: e.target.value})}></textarea>
                 </div>
                 <button onClick={salvarPerfil} className="btn btn-success fw-bold w-100 rounded-pill p-3">Salvar Alterações</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Novo/Editar Roteiro (Guia) */}
-      {modalRoteiro && (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1050 }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content rounded-4 border-0">
-              <div className="modal-header bg-dark text-white rounded-top-4 border-0">
-                <h5 className="fw-bold m-0"><i className="fas fa-route me-2"></i>{editandoRoteiroId ? 'Editar Roteiro' : 'Criar Novo Roteiro'}</h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setModalRoteiro(false)}></button>
-              </div>
-              <div className="modal-body p-4 p-md-5">
-                <form onSubmit={salvarOuEditarRoteiro}>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-8">
-                      <label className="form-label small fw-bold">Título do Passeio</label>
-                      <input type="text" className="form-control bg-light p-3" required value={novoRoteiro.titulo} onChange={e => setNovoRoteiro({...novoRoteiro, titulo: e.target.value})} />
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label small fw-bold">Preço (R$)</label>
-                      <input type="number" className="form-control bg-light p-3" required min="0" value={novoRoteiro.preco} onChange={e => setNovoRoteiro({...novoRoteiro, preco: e.target.value})} />
-                    </div>
-                  </div>
-                  <div className="row g-3 mb-3">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Horário de Início</label>
-                      <input type="time" className="form-control bg-light p-3" required value={novoRoteiro.horario} onChange={e => setNovoRoteiro({...novoRoteiro, horario: e.target.value})} />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold">Duração</label>
-                      <input type="text" className="form-control bg-light p-3" required value={novoRoteiro.duracao} onChange={e => setNovoRoteiro({...novoRoteiro, duracao: e.target.value})} />
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label small fw-bold">URL da Imagem do Local</label>
-                    <input type="url" className="form-control bg-light p-3" required value={novoRoteiro.imagemUrl} onChange={e => setNovoRoteiro({...novoRoteiro, imagemUrl: e.target.value})} />
-                  </div>
-                  <div className="mb-4">
-                    <label className="form-label small fw-bold">Descrição Completa</label>
-                    <textarea className="form-control bg-light p-3" rows="3" required value={novoRoteiro.descricao} onChange={e => setNovoRoteiro({...novoRoteiro, descricao: e.target.value})}></textarea>
-                  </div>
-                  <button type="submit" className="btn btn-success fw-bold w-100 rounded-pill p-3 fs-5 shadow-sm">
-                    {editandoRoteiroId ? 'Salvar Alterações' : 'Publicar Roteiro Oficial'}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Avaliação (Turista) */}
-      {modalAvaliacao && (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050 }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content rounded-4 border-0">
-              <div className="modal-header bg-dark text-white border-0 rounded-top-4">
-                <h5 className="modal-title fw-bold">Avaliar Experiência</h5>
-                <button type="button" className="btn-close btn-close-white" onClick={() => setModalAvaliacao(null)}></button>
-              </div>
-              <div className="modal-body p-4 text-center">
-                <h6 className="fw-bold mb-3">Como foi o pedido #{modalAvaliacao.id.substring(0,8)}?</h6>
-                <div className="d-flex justify-content-center gap-2 mb-4 fs-2 text-warning">
-                  {[1, 2, 3, 4, 5].map((estrela) => (
-                    <i key={estrela} className={`fa-star ${estrela <= nota ? 'fas' : 'far'}`} style={{ cursor: 'pointer' }} onClick={() => setNota(estrela)}></i>
-                  ))}
-                </div>
-                <textarea className="form-control bg-light p-3 mb-3" rows="3" placeholder="Conte o que você achou..." value={comentario} onChange={(e) => setComentario(e.target.value)}></textarea>
-                <button className="btn btn-success fw-bold w-100 rounded-pill p-3" onClick={() => { alert('Enviado com sucesso!'); setModalAvaliacao(null); }}>Publicar Avaliação</button>
               </div>
             </div>
           </div>
