@@ -16,6 +16,9 @@ export default function Explorar() {
   const [favoritos, setFavoritos] = useState([]); 
   const [localSelecionado, setLocalSelecionado] = useState(null);
   const [adicionadoFeedback, setAdicionadoFeedback] = useState(false);
+  
+  // ESTADO DO NOVO CARROSSEL REACT
+  const [fotoIndex, setFotoIndex] = useState(0); 
 
   // ESTADOS DA GAVETA DE FILTROS AVANÇADOS
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -183,7 +186,10 @@ export default function Explorar() {
         btn.onclick = () => {
           const localId = btn.getAttribute('data-id');
           const local = atracoesDb.find(a => a.id === localId);
-          if (local) setLocalSelecionado(local);
+          if (local) {
+            setLocalSelecionado(local);
+            setFotoIndex(0); // Reseta o carrossel ao abrir pelo mapa
+          }
         };
       }
     });
@@ -234,7 +240,6 @@ export default function Explorar() {
         `}
       </style>
 
-      {/* OVERLAY ESCURO DA GAVETA */}
       {isDrawerOpen && (
         <div 
           onClick={() => setIsDrawerOpen(false)}
@@ -408,6 +413,7 @@ export default function Explorar() {
                         className={`btn btn-sm fw-bold ${darkMode ? 'btn-outline-light' : 'btn-outline-dark'}`}
                         onClick={() => {
                           setLocalSelecionado(attr);
+                          setFotoIndex(0); // Zera o carrossel ao abrir um novo
                           setAdicionadoFeedback(false);
                         }}
                       >
@@ -422,7 +428,7 @@ export default function Explorar() {
         </div>
       </main>
 
-      {/* JANELA MODAL DE DETALHES (AGORA COM CARROSSEL) */}
+      {/* JANELA MODAL DE DETALHES COM CARROSSEL EM REACT */}
       {localSelecionado && (
         <div 
           onClick={() => setLocalSelecionado(null)}
@@ -436,7 +442,7 @@ export default function Explorar() {
               borderRadius: '20px', maxWidth: '500px', width: '100%', overflow: 'hidden', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto', border: darkMode ? '1px solid #333' : 'none'
             }}
           >
-            {/* BOTÃO FECHAR FLUTUANDO ACIMA DO CARROSSEL */}
+            {/* BOTÃO FECHAR */}
             <button 
               onClick={() => setLocalSelecionado(null)}
               style={{
@@ -448,30 +454,58 @@ export default function Explorar() {
               <i className="fas fa-times"></i>
             </button>
 
-            {/* O NOVO CARROSSEL DE FOTOS */}
-            <div id="carouselModalDetalhes" className="carousel slide" data-bs-ride="carousel">
-              <div className="carousel-inner" style={{ height: '250px' }}>
-                {/* Lógica: Se tiver galeria, roda a galeria. Se não, roda a imagem única como fallback! */}
-                {(localSelecionado.galeria && localSelecionado.galeria.length > 0 ? localSelecionado.galeria : [localSelecionado.imagem]).map((imgUrl, idx) => (
-                  <div className={`carousel-item h-100 ${idx === 0 ? 'active' : ''}`} key={idx}>
-                    <div style={{ height: '100%', backgroundImage: `url(${imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
-                  </div>
-                ))}
-              </div>
+            {/* O CARROSSEL 100% REACT (À Prova de Falhas) */}
+            <div className="position-relative" style={{ height: '260px', backgroundColor: '#000' }}>
               
-              {/* Só mostra as setinhas de navegação se houver mais de 1 foto */}
+              {/* Imagem Atual */}
+              <div style={{ 
+                height: '100%', width: '100%', 
+                backgroundImage: `url(${(localSelecionado.galeria && localSelecionado.galeria.length > 0) ? localSelecionado.galeria[fotoIndex] : localSelecionado.imagem})`, 
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                transition: 'background-image 0.3s ease-in-out'
+              }}></div>
+
+              {/* Setas e Bolinhas só aparecem se houver mais de 1 foto */}
               {(localSelecionado.galeria && localSelecionado.galeria.length > 1) && (
                 <>
-                  <button className="carousel-control-prev" type="button" data-bs-target="#carouselModalDetalhes" data-bs-slide="prev">
-                    <span className="carousel-control-prev-icon" aria-hidden="true" style={{ filter: 'drop-shadow(0px 0px 4px rgba(0,0,0,0.8))' }}></span>
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setFotoIndex((prev) => prev === 0 ? localSelecionado.galeria.length - 1 : prev - 1); 
+                    }}
+                    className="btn position-absolute top-50 start-0 translate-middle-y text-white border-0"
+                    style={{ fontSize: '2rem', textShadow: '0px 2px 5px rgba(0,0,0,0.8)' }}
+                  >
+                    <i className="fas fa-chevron-left"></i>
                   </button>
-                  <button className="carousel-control-next" type="button" data-bs-target="#carouselModalDetalhes" data-bs-slide="next">
-                    <span className="carousel-control-next-icon" aria-hidden="true" style={{ filter: 'drop-shadow(0px 0px 4px rgba(0,0,0,0.8))' }}></span>
+                  
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      setFotoIndex((prev) => (prev + 1) % localSelecionado.galeria.length); 
+                    }}
+                    className="btn position-absolute top-50 end-0 translate-middle-y text-white border-0"
+                    style={{ fontSize: '2rem', textShadow: '0px 2px 5px rgba(0,0,0,0.8)' }}
+                  >
+                    <i className="fas fa-chevron-right"></i>
                   </button>
+
+                  {/* Bolinhas Indicadoras */}
+                  <div className="position-absolute bottom-0 start-50 translate-middle-x mb-2 d-flex gap-2">
+                    {localSelecionado.galeria.map((_, idx) => (
+                      <div key={idx} style={{
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        backgroundColor: fotoIndex === idx ? '#fff' : 'rgba(255,255,255,0.4)',
+                        boxShadow: '0px 1px 3px rgba(0,0,0,0.5)',
+                        transition: 'background-color 0.3s'
+                      }}></div>
+                    ))}
+                  </div>
                 </>
               )}
             </div>
             
+            {/* INFORMAÇÕES ABAIXO DO CARROSSEL */}
             <div className="p-4">
               <span className="badge bg-light text-dark mb-2">{localSelecionado.tag}</span>
               <h3 className="fw-bold mb-1">{localSelecionado.titulo}</h3>
