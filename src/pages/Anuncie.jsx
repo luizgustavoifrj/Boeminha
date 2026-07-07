@@ -1,19 +1,16 @@
 import { useState } from 'react';
 import { firestore } from '../services/firebase';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../ThemeContext'; // <-- Importando o Cérebro do Tema!
 
 export default function Anuncie() {
   const [etapa, setEtapa] = useState(1);
   const [loading, setLoading] = useState(false);
   const [sucesso, setSucesso] = useState(false);
-  
-  const { darkMode } = useTheme(); // <-- Lendo se está escuro ou claro
 
-  // Dados mesclados (Contato + Detalhes do Local)
   const [formData, setFormData] = useState({
     nome: '', email: '', whatsapp: '', tipo: 'Bar ou Restaurante', mensagem: '',
-    tituloLocal: '', descricaoLocal: '', precoLocal: '', horarioLocal: '', imagemLocal: ''
+    tituloLocal: '', descricaoLocal: '', precoLocal: '', horarioLocal: '', imagemLocal: '',
+    categoria: 'boemia', tag: 'Novo', endereco: '', dias: 'Terça a Domingo'
   });
 
   const handleChange = (e) => {
@@ -42,7 +39,8 @@ export default function Anuncie() {
       setEtapa(1);
       setFormData({ 
         nome: '', email: '', whatsapp: '', tipo: 'Bar ou Restaurante', mensagem: '',
-        tituloLocal: '', descricaoLocal: '', precoLocal: '', horarioLocal: '', imagemLocal: '' 
+        tituloLocal: '', descricaoLocal: '', precoLocal: '', horarioLocal: '', imagemLocal: '',
+        categoria: 'boemia', tag: 'Novo', endereco: '', dias: 'Terça a Domingo'
       });
       setTimeout(() => setSucesso(false), 8000);
     } catch (error) {
@@ -53,9 +51,7 @@ export default function Anuncie() {
   };
 
   return (
-    // Removido o backgroundColor fixo. Agora ele obedece o fundo global do ThemeContext!
-    <div style={{ paddingTop: '76px', minHeight: '100vh' }}>
-      
+    <div style={{ paddingTop: '76px', backgroundColor: '#f8fcf9', minHeight: '100vh' }}>
       <header className="text-center text-white" style={{ background: 'linear-gradient(135deg, #1b4332 0%, #2d6a4f 100%)', padding: '60px 0 100px 0' }}>
         <div className="container">
           <span className="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-3">SEJA UM PARCEIRO BOEMINHA</span>
@@ -66,127 +62,126 @@ export default function Anuncie() {
       <section className="container" style={{ marginTop: '-60px', position: 'relative', zIndex: 10, paddingBottom: '100px' }}>
         <div className="row justify-content-center">
           <div className="col-lg-10">
-            
-            {/* O cartão agora reage ao Modo Escuro dinamicamente */}
-            <div className={`card border-0 shadow-lg rounded-4 p-4 p-md-5 ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`}>
+            <div className="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
               
               {sucesso ? (
                 <div className="text-center py-5">
                   <i className="fas fa-check-circle text-success" style={{ fontSize: '5rem' }}></i>
-                  <h3 className={`fw-bold mt-4 ${darkMode ? 'text-white' : 'text-dark'}`}>Solicitação Enviada!</h3>
-                  <p className={`${darkMode ? 'text-light opacity-75' : 'text-muted'} mb-4`}>Nossa equipe analisará seu perfil e entrará em contato via WhatsApp em até 48 horas.</p>
+                  <h3 className="fw-bold mt-4">Solicitação Enviada!</h3>
+                  <p className="text-muted mb-4">Nossa equipe analisará seu perfil e entrará em contato via WhatsApp em até 48 horas.</p>
                   <Link to="/" className="btn btn-outline-success fw-bold rounded-pill px-4">Voltar ao Início</Link>
                 </div>
               ) : (
                 <>
-                  {/* ETAPA 1: CONTATO */}
                   {etapa === 1 && (
                     <div className="animation-fade">
                       <div className="text-center mb-4">
-                        <h4 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Etapa 1: Seus Dados de Contato</h4>
-                        <div className="progress mt-3 mx-auto" style={{ height: '8px', maxWidth: '300px', backgroundColor: darkMode ? '#333' : '#e9ecef' }}>
-                          <div className="progress-bar bg-success" style={{ width: '50%' }}></div>
-                        </div>
+                        <h4 className="fw-bold text-dark">Etapa 1: Seus Dados de Contato</h4>
                       </div>
-
                       <form onSubmit={irParaProximaEtapa}>
                         <div className="row g-3 mb-3">
                           <div className="col-md-6">
-                            <label className={`form-label fw-bold small ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Nome do Responsável *</label>
-                            <input type="text" name="nome" value={formData.nome} onChange={handleChange} className={`form-control p-3 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} required />
+                            <label className="form-label fw-bold small text-muted">Nome do Responsável *</label>
+                            <input type="text" name="nome" value={formData.nome} onChange={handleChange} className="form-control bg-light p-3" required />
                           </div>
                           <div className="col-md-6">
-                            <label className={`form-label fw-bold small ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>WhatsApp *</label>
-                            <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} className={`form-control p-3 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} placeholder="(21) 90000-0000" required />
+                            <label className="form-label fw-bold small text-muted">WhatsApp *</label>
+                            <input type="text" name="whatsapp" value={formData.whatsapp} onChange={handleChange} className="form-control bg-light p-3" required />
                           </div>
                         </div>
-
                         <div className="row g-3 mb-3">
                           <div className="col-md-6">
-                            <label className={`form-label fw-bold small ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>E-mail Profissional *</label>
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} className={`form-control p-3 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} required />
+                            <label className="form-label fw-bold small text-muted">E-mail Profissional *</label>
+                            <input type="email" name="email" value={formData.email} onChange={handleChange} className="form-control bg-light p-3" required />
                           </div>
                           <div className="col-md-6">
-                            <label className={`form-label fw-bold small ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Tipo de Parceria *</label>
-                            <select name="tipo" value={formData.tipo} onChange={handleChange} className={`form-select p-3 fw-bold ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light text-dark'}`} required>
+                            <label className="form-label fw-bold small text-muted">Tipo de Parceria *</label>
+                            <select name="tipo" value={formData.tipo} onChange={handleChange} className="form-select bg-light p-3 fw-bold text-dark" required>
                               <option value="Bar ou Restaurante">Bar ou Restaurante</option>
                               <option value="Guia de Turismo">Guia de Turismo / Trilha</option>
                               <option value="Produtor de Eventos">Produtor de Eventos</option>
                             </select>
                           </div>
                         </div>
-
                         <div className="mb-4">
-                          <label className={`form-label fw-bold small ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Mensagem Adicional (Opcional)</label>
-                          <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className={`form-control p-3 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} rows="2"></textarea>
+                          <label className="form-label fw-bold small text-muted">Mensagem Adicional (Opcional)</label>
+                          <textarea name="mensagem" value={formData.mensagem} onChange={handleChange} className="form-control bg-light p-3" rows="2"></textarea>
                         </div>
-
-                        <button type="submit" className={`btn fw-bold w-100 p-3 rounded-pill shadow-sm ${darkMode ? 'btn-light text-dark' : 'btn-dark'}`}>
+                        <button type="submit" className="btn btn-dark fw-bold w-100 p-3 rounded-pill shadow-sm">
                           IR PARA A PRÓXIMA ETAPA <i className="fas fa-arrow-right ms-2"></i>
                         </button>
                       </form>
                     </div>
                   )}
 
-                  {/* ETAPA 2: DADOS DO LOCAL COM PRÉVIA */}
                   {etapa === 2 && (
                     <div className="animation-fade">
                       <div className="text-center mb-4">
                         <button onClick={voltarEtapa} className="btn btn-sm btn-link text-success text-decoration-none float-start"><i className="fas fa-arrow-left me-1"></i> Voltar</button>
-                        <h4 className={`fw-bold m-0 ${darkMode ? 'text-white' : 'text-dark'}`}>Etapa 2: Monte seu Anúncio</h4>
-                        <div className="progress mt-3 mx-auto" style={{ height: '8px', maxWidth: '300px', backgroundColor: darkMode ? '#333' : '#e9ecef' }}>
-                          <div className="progress-bar bg-success" style={{ width: '100%' }}></div>
-                        </div>
+                        <h4 className="fw-bold text-dark m-0">Etapa 2: Monte seu Anúncio</h4>
                       </div>
 
                       <div className="row g-5 mt-2">
-                        {/* Formulário de Montagem */}
                         <div className="col-lg-6">
                           <form onSubmit={handleSubmit}>
                             <div className="mb-3">
                               <label className="form-label fw-bold small">Nome do Local / Experiência *</label>
-                              <input type="text" name="tituloLocal" value={formData.tituloLocal} onChange={handleChange} className={`form-control p-2 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} required />
+                              <input type="text" name="tituloLocal" value={formData.tituloLocal} onChange={handleChange} className="form-control bg-light p-2" required />
+                            </div>
+                            <div className="row g-2 mb-3">
+                              <div className="col-6">
+                                <label className="form-label fw-bold small">Categoria no Site *</label>
+                                <select name="categoria" value={formData.categoria} onChange={handleChange} className="form-select bg-light p-2" required>
+                                  <option value="boemia">Bares e Botecos</option>
+                                  <option value="gastronomia">Gastronomia</option>
+                                  <option value="natureza">Trilhas & Natureza</option>
+                                  <option value="cultura">Arte & Cultura</option>
+                                </select>
+                              </div>
+                              <div className="col-6">
+                                <label className="form-label fw-bold small">Tag (Ex: Música ao Vivo) *</label>
+                                <input type="text" name="tag" value={formData.tag} onChange={handleChange} className="form-control bg-light p-2" required />
+                              </div>
                             </div>
                             <div className="row g-2 mb-3">
                               <div className="col-6">
                                 <label className="form-label fw-bold small">Preço Médio (R$)</label>
-                                <input type="number" name="precoLocal" value={formData.precoLocal} onChange={handleChange} className={`form-control p-2 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} />
+                                <input type="number" name="precoLocal" value={formData.precoLocal} onChange={handleChange} className="form-control bg-light p-2" />
                               </div>
                               <div className="col-6">
-                                <label className="form-label fw-bold small">Horário/Duração</label>
-                                <input type="text" name="horarioLocal" value={formData.horarioLocal} onChange={handleChange} className={`form-control p-2 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} placeholder="Ex: 18h às 02h" />
+                                <label className="form-label fw-bold small">Horário de Func.</label>
+                                <input type="text" name="horarioLocal" value={formData.horarioLocal} onChange={handleChange} className="form-control bg-light p-2" />
                               </div>
                             </div>
                             <div className="mb-3">
+                              <label className="form-label fw-bold small">Endereço Completo *</label>
+                              <input type="text" name="endereco" value={formData.endereco} onChange={handleChange} className="form-control bg-light p-2" required />
+                            </div>
+                            <div className="mb-3">
                               <label className="form-label fw-bold small">Link da Imagem Principal *</label>
-                              <input type="url" name="imagemLocal" value={formData.imagemLocal} onChange={handleChange} className={`form-control p-2 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} placeholder="https://..." required />
+                              <input type="url" name="imagemLocal" value={formData.imagemLocal} onChange={handleChange} className="form-control bg-light p-2" required />
                             </div>
                             <div className="mb-4">
                               <label className="form-label fw-bold small">Descrição do Anúncio *</label>
-                              <textarea name="descricaoLocal" value={formData.descricaoLocal} onChange={handleChange} className={`form-control p-2 ${darkMode ? 'bg-dark text-white border-secondary' : 'bg-light'}`} rows="3" required></textarea>
+                              <textarea name="descricaoLocal" value={formData.descricaoLocal} onChange={handleChange} className="form-control bg-light p-2" rows="3" required></textarea>
                             </div>
                             <button type="submit" className="btn btn-success fw-bold w-100 p-3 rounded-pill shadow-sm" disabled={loading}>
-                              {loading ? 'ENVIANDO...' : <><i className="fas fa-check-circle me-2"></i> ENVIAR SOLICITAÇÃO</>}
+                              {loading ? 'ENVIANDO...' : 'ENVIAR SOLICITAÇÃO'}
                             </button>
                           </form>
                         </div>
 
-                        {/* Coluna da Prévia Visual */}
                         <div className="col-lg-6">
-                          <label className={`form-label fw-bold small d-block text-center mb-3 ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Como os turistas verão:</label>
-                          <div className={`card h-100 border-0 shadow-sm rounded-4 overflow-hidden mx-auto ${darkMode ? 'bg-dark border border-secondary' : 'bg-light'}`} style={{ maxWidth: '350px' }}>
-                            <div style={{ height: '200px', backgroundColor: darkMode ? '#333' : '#e9ecef', backgroundImage: `url(${formData.imagemLocal})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative' }}>
-                              <span className="badge bg-dark text-white position-absolute bottom-0 start-0 m-3 p-2 fw-bold shadow-sm">
-                                <i className="far fa-clock me-1"></i> {formData.horarioLocal || 'Horário'}
-                              </span>
-                            </div>
+                          <label className="form-label fw-bold small text-muted d-block text-center mb-3">Como os turistas verão:</label>
+                          <div className="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mx-auto" style={{ maxWidth: '350px' }}>
+                            <div style={{ height: '200px', backgroundColor: '#e9ecef', backgroundImage: `url(${formData.imagemLocal})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
                             <div className="card-body p-4 d-flex flex-column">
-                              <span className="badge bg-success bg-opacity-10 text-success mb-2 align-self-start">{formData.tipo}</span>
-                              <h5 className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>{formData.tituloLocal || 'Nome do seu Negócio'}</h5>
-                              <p className={`small mb-4 flex-grow-1 ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>{formData.descricaoLocal || 'Sua descrição aparecerá aqui...'}</p>
-                              <div className={`mt-auto d-flex justify-content-between align-items-center pt-3 border-top ${darkMode ? 'border-secondary' : ''}`}>
-                                <span className="fw-bold text-success fs-5">R$ {formData.precoLocal || '00'},00</span>
-                                <button type="button" className={`btn fw-bold rounded-pill px-3 shadow-sm disabled ${darkMode ? 'btn-secondary text-light' : 'btn-dark'}`}>Ver Mais</button>
+                              <span className="badge bg-light text-dark mb-2 align-self-start">{formData.tag}</span>
+                              <h5 className="fw-bold text-dark mb-2">{formData.tituloLocal || 'Nome do Local'}</h5>
+                              <p className="text-muted small mb-4">{formData.descricaoLocal || 'Sua descrição aparecerá aqui...'}</p>
+                              <div className="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                                <span className="fw-bold text-success fs-5">R$ {formData.precoLocal || '0'},00</span>
+                                <button type="button" className="btn btn-sm btn-outline-dark fw-bold rounded-pill">Ver Detalhes</button>
                               </div>
                             </div>
                           </div>

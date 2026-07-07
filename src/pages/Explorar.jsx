@@ -3,8 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { atracoesDb } from '../data/database';
+import { firestore } from '../services/firebase';
 
 export default function Explorar() {
+  const [todasAtracoes, setTodasAtracoes] = useState(atracoesDb);
   const [atracoes, setAtracoes] = useState(atracoesDb);
   const [filtroAtivo, setFiltroAtivo] = useState('all');
   const [favoritos, setFavoritos] = useState([]); 
@@ -13,6 +15,41 @@ export default function Explorar() {
   
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Busca os parceiros aprovados no Firebase e une com o banco local
+  useEffect(() => {
+    const fetchParceirosAprovados = async () => {
+      try {
+        const snapshot = await firestore.collection('solicitacoes_parceria').where('status', '==', 'Aprovado').get();
+        const locaisFirebase = snapshot.docs.map(doc => {
+          const d = doc.data();
+          return {
+            id: doc.id,
+            titulo: d.tituloLocal || 'Local Parceiro',
+            descricao: d.descricaoLocal || '',
+            imagem: d.imagemLocal || '',
+            preco: parseFloat(d.precoLocal) || 0,
+            horario: d.horarioLocal || 'Aberto',
+            dias: d.dias || 'Terça a Domingo',
+            endereco: d.endereco || 'Niterói, RJ',
+            categoria: d.categoria || 'boemia',
+            tag: d.tag || 'Destaque',
+            // Define coordenadas falsas em Niterói para o mapa funcionar
+            lat: -22.90 + (Math.random() * 0.05),
+            lng: -43.10 - (Math.random() * 0.05),
+            subtopicos: ['Parceiro Oficial', d.tag]
+          };
+        });
+        
+        const combinadas = [...atracoesDb, ...locaisFirebase];
+        setTodasAtracoes(combinadas);
+      } catch (error) {
+        console.error("Erro ao buscar locais do Firebase:", error);
+      }
+    };
+    
+    fetchParceirosAprovados();
+  }, []);
 
   useEffect(() => {
     const favsSalvos = JSON.parse(localStorage.getItem('boeMinha_favs')) || [];
@@ -30,7 +67,7 @@ export default function Explorar() {
     localStorage.setItem('boeMinha_favs', JSON.stringify(novosFavs));
 
     if (filtroAtivo === 'favoritos') {
-      setAtracoes(atracoesDb.filter(a => novosFavs.includes(a.id)));
+      setAtracoes(todasAtracoes.filter(a => novosFavs.includes(a.id)));
     }
   };
 
@@ -52,9 +89,6 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // ======================================================================
-  // MAPA COM BALÃOZINHO (POPUP) RICO EM DETALHES!
-  // ======================================================================
   useEffect(() => {
     const container = document.getElementById('map-container');
     if (!container) return;
@@ -111,12 +145,10 @@ export default function Explorar() {
       });
     };
 
-    // Montando os pinos e os balões (popups) visuais
     atracoes.forEach((attr) => {
       if (attr.lat && attr.lng) {
         const iconePronto = obterPinoModerno(attr.categoria, filtroAtivo === 'favoritos');
         
-        // A MÁGICA DO NOVO POPUP: HTML puro sendo injetado com a foto e o botão!
         const popupHTML = `
           <div style="width: 170px; text-align: center; font-family: 'Inter', sans-serif;">
             <div style="width: 100%; height: 100px; background-image: url('${attr.imagem}'); background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
@@ -136,7 +168,6 @@ export default function Explorar() {
       }
     });
 
-    // O TRUQUE: Toda vez que um balãozinho abrir no mapa, ativamos o clique do botão dele!
     mapa.on('popupopen', () => {
       const btn = document.querySelector('.btn-popup-detalhes');
       if (btn) {
@@ -144,7 +175,7 @@ export default function Explorar() {
           const localId = btn.getAttribute('data-id');
           const local = atracoes.find(a => a.id === localId);
           if (local) {
-            setLocalSelecionado(local); // Abre a janela de detalhes gigante!
+            setLocalSelecionado(local); 
           }
         };
       }
@@ -159,7 +190,6 @@ export default function Explorar() {
       mapa.remove();
     };
   }, [atracoes, filtroAtivo]); 
-  // ======================================================================
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -167,7 +197,7 @@ export default function Explorar() {
     
     if (termoBuscado) {
       const buscaFormatada = termoBuscado.toLowerCase().trim();
-      const filtradas = atracoesDb.filter(attr => 
+      const filtradas = todasAtracoes.filter(attr => 
         attr.titulo.toLowerCase().includes(buscaFormatada) ||
         attr.descricao.toLowerCase().includes(buscaFormatada) ||
         attr.tag.toLowerCase().includes(buscaFormatada)
@@ -175,19 +205,19 @@ export default function Explorar() {
       setAtracoes(filtradas);
       setFiltroAtivo('all');
     } else {
-      setAtracoes(atracoesDb);
+      setAtracoes(todasAtracoes);
     }
-  }, [location.search]);
+  }, [location.search, todasAtracoes]);
 
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
     navigate('?'); 
     if (categoria === 'all') {
-      setAtracoes(atracoesDb);
+      setAtracoes(todasAtracoes);
     } else if (categoria === 'favoritos') {
-      setAtracoes(atracoesDb.filter(a => favoritos.includes(a.id)));
+      setAtracoes(todasAtracoes.filter(a => favoritos.includes(a.id)));
     } else {
-      setAtracoes(atracoesDb.filter(a => a.categoria === categoria));
+      setAtracoes(todasAtracoes.filter(a => a.categoria === categoria));
     }
   };
 
@@ -214,7 +244,6 @@ export default function Explorar() {
           .btn-cat-favoritos { color: #9b59b6; border: 2px solid #9b59b6; background: transparent; }
           .btn-cat-favoritos:hover, .btn-cat-favoritos.active { background-color: #9b59b6; color: white; }
           
-          /* Ajuste sutil para o balão do Leaflet ficar mais elegante */
           .leaflet-popup-content { margin: 12px 14px !important; line-height: 1.3 !important; }
         `}
       </style>
