@@ -89,7 +89,7 @@ export const atracoesDb = [
     endereco: "Acesso pelo Parque da Cidade"
   },
   {
-    id: "parque-cidade",
+    id: "parquee-cidade",
     titulo: "Parque da Cidade",
     categoria: "natureza",
     tag: "Pôr do Sol",
