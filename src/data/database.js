@@ -11,8 +11,11 @@ export const atracoesDb = [
     imagem: "https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg",
     patrocinado: false,
     lat: -22.9068, lng: -43.1244,
-    dias: "Terça a Domingo", horario: "10h às 18h",
-    endereco: "Mirante da Boa Viagem, s/n - Boa Viagem"
+    dias: "Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "10h às 18h",
+    endereco: "Mirante da Boa Viagem, s/n - Boa Viagem",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "correios",
@@ -25,8 +28,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?q=80&w=800",
     patrocinado: false,
     lat: -22.8945, lng: -43.1220,
-    dias: "Segunda a Sábado", horario: "11h às 18h",
-    endereco: "Av. Visconde do Rio Branco, 481 - Centro"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta e Sábado", 
+    horario: "11h às 18h",
+    endereco: "Av. Visconde do Rio Branco, 481 - Centro",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "abrigo-bondes",
@@ -39,8 +45,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?q=80&w=800",
     patrocinado: false,
     lat: -22.8950, lng: -43.1210,
-    dias: "Segunda a Sexta", horario: "09h às 18h",
-    endereco: "Marquês de Paraná, 100 - Centro"
+    dias: "Segunda, Terça, Quarta, Quinta e Sexta", 
+    horario: "09h às 18h",
+    endereco: "Marquês de Paraná, 100 - Centro",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "quintal-cultural",
@@ -53,8 +62,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800",
     patrocinado: false,
     lat: -22.9000, lng: -43.1150,
-    dias: "Quarta a Domingo", horario: "18h às 01h",
-    endereco: "R. Américo Oberlaender, 580 - Santa Rosa"
+    dias: "Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "18h às 01h",
+    endereco: "R. Américo Oberlaender, 580 - Santa Rosa",
+    petFriendly: true,
+    coberto: false
   },
 
   // --- NATUREZA ---
@@ -70,12 +82,15 @@ export const atracoesDb = [
     patrocinado: false,
     guia: { nome: "Pedro Rocha", foto: "https://randomuser.me/api/portraits/men/45.jpg" },
     lat: -22.976, lng: -43.0275,
-    dias: "Todos os dias", horario: "08h às 17h",
-    endereco: "Parque Estadual da Serra da Tiririca"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "08h às 17h",
+    endereco: "Parque Estadual da Serra da Tiririca",
+    petFriendly: false,
+    coberto: false
   },
   {
     id: "tupinamba",
-    titulo: "Trilahaaa do Tupinambá",
+    titulo: "Trilha do Tupinambá",
     categoria: "natureza",
     tag: "Trilha & Mirante",
     subtopicos: ["Ar Livre", "Pet Friendly", "Mirante Secreto"],
@@ -85,12 +100,15 @@ export const atracoesDb = [
     patrocinado: false,
     guia: { nome: "Aline Silva", foto: "https://randomuser.me/api/portraits/women/32.jpg" },
     lat: -22.925, lng: -43.080,
-    dias: "Terça a Domingo", horario: "08h às 16h",
-    endereco: "Acesso pelo Parque da Cidade"
+    dias: "Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "08h às 16h",
+    endereco: "Acesso pelo Parque da Cidade",
+    petFriendly: true,
+    coberto: false
   },
   {
     id: "parque-cidade",
-    titulo: "parqqee da Cidade",
+    titulo: "Parque da Cidade",
     categoria: "natureza",
     tag: "Pôr do Sol",
     subtopicos: ["Ar Livre", "Parapente", "Vista Rio"],
@@ -99,8 +117,11 @@ export const atracoesDb = [
     imagem: "https://www.viajenaviagem.com/wp-content/uploads/2021/07/niteroi-1920x640-1.jpg",
     patrocinado: false,
     lat: -22.9158, lng: -43.0858,
-    dias: "Todos os dias", horario: "07h às 18h",
-    endereco: "Estr. da Viração, s/n - São Francisco"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "07h às 18h",
+    endereco: "Estr. da Viração, s/n - São Francisco",
+    petFriendly: true,
+    coberto: false
   },
   {
     id: "mirante-piratininga",
@@ -113,8 +134,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1444464666168-49b626d49cb4?q=80&w=800",
     patrocinado: false,
     lat: -22.9600, lng: -43.0600,
-    dias: "Aberto 24h", horario: "Livre",
-    endereco: "Extremo da Praia de Piratininga"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "Livre",
+    endereco: "Extremo da Praia de Piratininga",
+    petFriendly: true,
+    coberto: false
   },
 
   // --- BOEMIA ---
@@ -130,8 +154,11 @@ export const atracoesDb = [
     patrocinado: true,
     linkPatrocinado: "https://www.ingresso.com",
     lat: -22.9015, lng: -43.132,
-    dias: "Quinta a Domingo", horario: "A partir das 18h",
-    endereco: "Rua Alexandre Moura, 2A - São Domingos"
+    dias: "Quinta, Sexta, Sábado e Domingo", 
+    horario: "A partir das 18h",
+    endereco: "Rua Alexandre Moura, 2A - São Domingos",
+    petFriendly: true,
+    coberto: false
   },
   {
     id: "porao-underground",
@@ -144,8 +171,11 @@ export const atracoesDb = [
     imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQe8-iReFffr6i_RxS7X1f-KuOMpPjgHNi8Bg&s",
     patrocinado: false,
     lat: -22.890, lng: -43.120,
-    dias: "Sexta e Sábado", horario: "22h às 05h",
-    endereco: "Subsolo do Centro Comercial - Centro"
+    dias: "Sexta e Sábado", 
+    horario: "22h às 05h",
+    endereco: "Subsolo do Centro Comercial - Centro",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "toca-gamba",
@@ -158,8 +188,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=800",
     patrocinado: false,
     lat: -22.8879, lng: -43.1235,
-    dias: "Sexta a Domingo", horario: "A partir das 19h",
-    endereco: "Travessa Carlos Gomes, 23 - Barreto"
+    dias: "Sexta, Sábado e Domingo", 
+    horario: "A partir das 19h",
+    endereco: "Travessa Carlos Gomes, 23 - Barreto",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "boteco-confraria",
@@ -172,8 +205,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?q=80&w=800",
     patrocinado: false,
     lat: -22.9060, lng: -43.1090,
-    dias: "Terça a Domingo", horario: "11h às 01h",
-    endereco: "R. Nóbrega, 237 - Icaraí"
+    dias: "Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "11h às 01h",
+    endereco: "R. Nóbrega, 237 - Icaraí",
+    petFriendly: true,
+    coberto: true
   },
   {
     id: "center-bar",
@@ -185,8 +221,11 @@ export const atracoesDb = [
     preco: 15.00,
     imagem: "https://images.unsplash.com/photo-1566417713940-fe7c737a9ef2?q=80&w=800",
     lat: -22.9100, lng: -43.1050,
-    dias: "Segunda a Sábado", horario: "16h às 02h",
-    endereco: "Av. Jansen de Melo, 14 - Centro"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta e Sábado", 
+    horario: "16h às 02h",
+    endereco: "Av. Jansen de Melo, 14 - Centro",
+    petFriendly: true,
+    coberto: true
   },
 
   // --- GASTRONOMIA ---
@@ -201,8 +240,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=800",
     patrocinado: false,
     lat: -22.9030, lng: -43.1100,
-    dias: "Segunda a Sábado", horario: "09h às 19h",
-    endereco: "Rua Gavião Peixoto - Icaraí"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta e Sábado", 
+    horario: "09h às 19h",
+    endereco: "Rua Gavião Peixoto - Icaraí",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "cassia-brunch",
@@ -215,8 +257,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1495474472204-51ea99282214?q=80&w=800",
     patrocinado: false,
     lat: -22.9110, lng: -43.1070,
-    dias: "Terça a Domingo", horario: "10h às 20h",
-    endereco: "Polo Gastronômico de Icaraí"
+    dias: "Terça, Quarta, Quinta, Sexta, Sábado e Domingo", 
+    horario: "10h às 20h",
+    endereco: "Polo Gastronômico de Icaraí",
+    petFriendly: true,
+    coberto: true
   },
   {
     id: "matutino-cafe",
@@ -229,8 +274,11 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800",
     patrocinado: false,
     lat: -22.9075, lng: -43.1055,
-    dias: "Segunda a Sábado", horario: "08h às 19h",
-    endereco: "Rua Miguel de Frias - Icaraí"
+    dias: "Segunda, Terça, Quarta, Quinta, Sexta e Sábado", 
+    horario: "08h às 19h",
+    endereco: "Rua Miguel de Frias - Icaraí",
+    petFriendly: false,
+    coberto: true
   },
   {
     id: "da-vinci-cafe",
@@ -243,7 +291,10 @@ export const atracoesDb = [
     imagem: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?q=80&w=800",
     patrocinado: false,
     lat: -22.9020, lng: -43.1110,
-    dias: "Segunda a Sexta", horario: "08h às 18h",
-    endereco: "Rua Moreira César - Icaraí"
+    dias: "Segunda, Terça, Quarta, Quinta e Sexta", 
+    horario: "08h às 18h",
+    endereco: "Rua Moreira César - Icaraí",
+    petFriendly: false,
+    coberto: true
   }
 ];
