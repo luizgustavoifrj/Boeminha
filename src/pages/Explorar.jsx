@@ -19,7 +19,7 @@ export default function Explorar() {
 
   // ESTADOS DA GAVETA DE FILTROS AVANÇADOS
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [precoMax, setPrecoMax] = useState(300); // Slider de preço (0 a 300+)
+  const [precoMax, setPrecoMax] = useState(300);
   const [petFriendly, setPetFriendly] = useState(false);
   const [coberto, setCoberto] = useState(false);
   const [diaSemana, setDiaSemana] = useState('');
@@ -59,37 +59,30 @@ export default function Explorar() {
     localStorage.setItem('boeminha_cart', JSON.stringify(cartSalvo));
   };
 
-  // ==========================================
   // O CÉREBRO UNIFICADO DE FILTRAGEM
-  // ==========================================
   useEffect(() => {
     let resultados = [...atracoesDb];
 
-    // 1. Filtro da Barra de Pesquisa (URL)
     const termoBuscado = new URLSearchParams(location.search).get("busca");
     if (termoBuscado) {
       const buscaFormatada = termoBuscado.toLowerCase().trim();
       resultados = resultados.filter(attr => 
         attr.titulo.toLowerCase().includes(buscaFormatada) ||
         attr.descricao.toLowerCase().includes(buscaFormatada) ||
-        attr.tag.toLowerCase().includes(buscaFormatada)
+        attr.tag.toLowerCase().includes(buscaFormatada) ||
+        attr.categoria.toLowerCase().includes(buscaFormatada)
       );
     }
 
-    // 2. Filtro de Categoria (Botões redondos)
     if (filtroAtivo === 'favoritos') {
       resultados = resultados.filter(a => favoritos.includes(a.id));
     } else if (filtroAtivo !== 'all') {
       resultados = resultados.filter(a => a.categoria === filtroAtivo);
     }
 
-    // 3. Filtros Avançados (Gaveta)
-    // Preço
     resultados = resultados.filter(a => (a.preco || 0) <= precoMax);
-    // Booleanos
     if (petFriendly) resultados = resultados.filter(a => a.petFriendly === true);
     if (coberto) resultados = resultados.filter(a => a.coberto === true);
-    // Dia da Semana (procura a palavra no texto de dias de funcionamento do BD)
     if (diaSemana) {
       resultados = resultados.filter(a => a.dias && a.dias.toLowerCase().includes(diaSemana.toLowerCase()));
     }
@@ -128,7 +121,7 @@ export default function Explorar() {
         cor = '#2d6a4f'; 
         icone = 'fa-tree';
       } else if (categoria === 'boemia') {
-        cor = '#f1c40f'; // Amarelo BoeMinha para Boemia!
+        cor = '#f1c40f'; 
         icone = 'fa-beer';
       } else if (categoria === 'gastronomia') {
         cor = '#e63946'; 
@@ -236,20 +229,12 @@ export default function Explorar() {
           .dark-map { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
           .leaflet-popup-content { margin: 12px 14px !important; line-height: 1.3 !important; }
 
-          /* Custom Checkbox Toggle */
-          .form-switch .form-check-input {
-            width: 2.5rem;
-            height: 1.25rem;
-            cursor: pointer;
-          }
-          .form-switch .form-check-input:checked {
-            background-color: #2d6a4f;
-            border-color: #2d6a4f;
-          }
+          .form-switch .form-check-input { width: 2.5rem; height: 1.25rem; cursor: pointer; }
+          .form-switch .form-check-input:checked { background-color: #2d6a4f; border-color: #2d6a4f; }
         `}
       </style>
 
-      {/* OVERLAY ESCURO PARA FECHAR A GAVETA */}
+      {/* OVERLAY ESCURO DA GAVETA */}
       {isDrawerOpen && (
         <div 
           onClick={() => setIsDrawerOpen(false)}
@@ -275,7 +260,6 @@ export default function Explorar() {
           </button>
         </div>
 
-        {/* 1. Limite de Preço */}
         <div className="mb-4">
           <label className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>Preço Máximo: R$ {precoMax}</label>
           <input 
@@ -288,7 +272,6 @@ export default function Explorar() {
           </div>
         </div>
 
-        {/* 2. Dia de Funcionamento */}
         <div className="mb-4">
           <label className={`fw-bold mb-2 ${darkMode ? 'text-white' : 'text-dark'}`}>Dia da Semana</label>
           <select 
@@ -306,7 +289,6 @@ export default function Explorar() {
           </select>
         </div>
 
-        {/* 3. Comodidades Especiais (Toggles) */}
         <div className="mb-4">
           <label className={`fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}>Comodidades</label>
           
@@ -358,7 +340,6 @@ export default function Explorar() {
           <span className={`small fw-bold ${darkMode ? 'text-light opacity-50' : 'text-muted'}`}>{atracoes.length} Resultados</span>
         </div>
 
-        {/* BARRA DE FILTROS COM O BOTÃO DA GAVETA */}
         <div className="filter-container d-flex gap-2 mb-4 flex-wrap align-items-center">
           <button className={`btn rounded-pill fw-bold btn-cat-all ${filtroAtivo === 'all' ? 'active' : ''}`} onClick={() => filtrar('all')}>Todos os Locais</button>
           <button className={`btn rounded-pill fw-bold btn-cat-natureza ${filtroAtivo === 'natureza' ? 'active' : ''}`} onClick={() => filtrar('natureza')}><i className="fas fa-tree me-1"></i> Natureza</button>
@@ -367,13 +348,11 @@ export default function Explorar() {
           <button className={`btn rounded-pill fw-bold btn-cat-cultura ${filtroAtivo === 'cultura' ? 'active' : ''}`} onClick={() => filtrar('cultura')}> <i className="fas fa-palette me-1"></i> Cultura</button>
           
           <div className="ms-lg-auto d-flex gap-2">
-            {/* O BOTÃO QUE ABRE A GAVETA */}
             <button 
               className={`btn rounded-pill fw-bold ${darkMode ? 'btn-outline-light' : 'btn-outline-dark'}`} 
               onClick={() => setIsDrawerOpen(true)}
             >
               <i className="fas fa-sliders-h me-1"></i> Filtros
-              {/* Pontinho vermelho se tiver filtro ativo */}
               {(precoMax < 300 || petFriendly || coberto || diaSemana) && (
                 <span className="position-absolute translate-middle p-1 bg-danger border border-light rounded-circle" style={{marginTop: '5px'}}></span>
               )}
@@ -415,7 +394,6 @@ export default function Explorar() {
                     <h5 className="fw-bold">{attr.titulo}</h5>
                     <p className="text-muted small flex-grow-1" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{attr.descricao}</p>
                     
-                    {/* Exibe ícones na vitrine se tiver comodidades */}
                     <div className="d-flex gap-2 mb-3 mt-1">
                        {attr.petFriendly && <span className="badge bg-warning text-dark"><i className="fas fa-dog"></i> Pet</span>}
                        {attr.coberto && <span className="badge bg-info text-dark"><i className="fas fa-umbrella"></i> Coberto</span>}
@@ -444,7 +422,7 @@ export default function Explorar() {
         </div>
       </main>
 
-      {/* JANELA MODAL DE DETALHES (inalterada) */}
+      {/* JANELA MODAL DE DETALHES (AGORA COM CARROSSEL) */}
       {localSelecionado && (
         <div 
           onClick={() => setLocalSelecionado(null)}
@@ -458,10 +436,11 @@ export default function Explorar() {
               borderRadius: '20px', maxWidth: '500px', width: '100%', overflow: 'hidden', position: 'relative', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto', border: darkMode ? '1px solid #333' : 'none'
             }}
           >
+            {/* BOTÃO FECHAR FLUTUANDO ACIMA DO CARROSSEL */}
             <button 
               onClick={() => setLocalSelecionado(null)}
               style={{
-                position: 'absolute', top: '15px', right: '15px', zIndex: 10,
+                position: 'absolute', top: '15px', right: '15px', zIndex: 1050,
                 background: darkMode ? 'rgba(50,50,50,0.9)' : 'rgba(255,255,255,0.9)', 
                 color: darkMode ? '#fff' : '#000', border: 'none', borderRadius: '50%', width: '36px', height: '36px', fontWeight: 'bold', cursor: 'pointer'
               }}
@@ -469,7 +448,29 @@ export default function Explorar() {
               <i className="fas fa-times"></i>
             </button>
 
-            <div style={{ height: '220px', backgroundImage: `url(${localSelecionado.imagem})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+            {/* O NOVO CARROSSEL DE FOTOS */}
+            <div id="carouselModalDetalhes" className="carousel slide" data-bs-ride="carousel">
+              <div className="carousel-inner" style={{ height: '250px' }}>
+                {/* Lógica: Se tiver galeria, roda a galeria. Se não, roda a imagem única como fallback! */}
+                {(localSelecionado.galeria && localSelecionado.galeria.length > 0 ? localSelecionado.galeria : [localSelecionado.imagem]).map((imgUrl, idx) => (
+                  <div className={`carousel-item h-100 ${idx === 0 ? 'active' : ''}`} key={idx}>
+                    <div style={{ height: '100%', backgroundImage: `url(${imgUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Só mostra as setinhas de navegação se houver mais de 1 foto */}
+              {(localSelecionado.galeria && localSelecionado.galeria.length > 1) && (
+                <>
+                  <button className="carousel-control-prev" type="button" data-bs-target="#carouselModalDetalhes" data-bs-slide="prev">
+                    <span className="carousel-control-prev-icon" aria-hidden="true" style={{ filter: 'drop-shadow(0px 0px 4px rgba(0,0,0,0.8))' }}></span>
+                  </button>
+                  <button className="carousel-control-next" type="button" data-bs-target="#carouselModalDetalhes" data-bs-slide="next">
+                    <span className="carousel-control-next-icon" aria-hidden="true" style={{ filter: 'drop-shadow(0px 0px 4px rgba(0,0,0,0.8))' }}></span>
+                  </button>
+                </>
+              )}
+            </div>
             
             <div className="p-4">
               <span className="badge bg-light text-dark mb-2">{localSelecionado.tag}</span>
@@ -483,10 +484,8 @@ export default function Explorar() {
 
               <p className={`${darkMode ? 'text-light opacity-75' : 'text-muted'} mb-4`} style={{ lineHeight: '1.5', fontSize: '0.95rem' }}>{localSelecionado.descricao}</p>
               
-              {/* Caixa de Informações */}
               <div className={`${darkMode ? 'bg-dark' : 'bg-light'} p-3 rounded-3 mb-4`} style={{ border: `1px solid ${darkMode ? '#333' : '#eee'}` }}>
                 
-                {/* Mostra Comodidades dentro do Modal se existirem */}
                 {(localSelecionado.petFriendly || localSelecionado.coberto) && (
                   <div className="d-flex gap-3 mb-3 pb-2 border-bottom border-secondary">
                     {localSelecionado.petFriendly && <span className="fw-bold small text-warning"><i className="fas fa-dog me-1"></i> Aceita Pets</span>}
