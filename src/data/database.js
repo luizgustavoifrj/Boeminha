@@ -30,10 +30,10 @@ export const atracoesDb = [
     subtopicos: ["Coberto", "Exposições", "Histórico"],
     descricao: "Localizado no coração do centro da cidade, este imponente palacete histórico foi totalmente restaurado para abrigar a arte e a cultura. O contraste entre a arquitetura clássica do início do século XX e as exposições de arte moderna que ocupam seus salões cria uma atmosfera única. É um passeio tranquilo, altamente acessível e perfeito para quem deseja uma imersão cultural profunda sem precisar se afastar do circuito urbano.",
     preco: 0.00,
-    imagem: "https://images.unsplash.com/photo-1561839561-b13bcfe95249?q=80&w=1000",
+    imagem: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5ACo89U-WWlRUngAKgeQMefHaJiIziodv1iSrR7uXcjmkrhHnz52iXFcO&s=10",
     galeria: [
-      "https://images.unsplash.com/photo-1561839561-b13bcfe95249?q=80&w=1000",
-      "https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?q=80&w=1000",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGNcAfRVjrXWHPQdIg59kLxCJ1jIjfUosvxmyA-BpvswANyz5UFK9vBi3h&s=10",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTO8Zc5E08CVp1NFH7AL1rtnsRXwfAWn0tlZoQ-R4hCekznSQoWbpfxHO9U&s=10",
       "https://images.unsplash.com/photo-1531058020387-3be344556be6?q=80&w=1000"
     ],
     patrocinado: false,
