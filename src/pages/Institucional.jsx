@@ -5,7 +5,6 @@ export default function Institucional() {
   const location = useLocation();
   const [abaAtiva, setAbaAtiva] = useState('sobre');
 
-  // Muda a aba ativa baseado no link clicado no rodapé
   useEffect(() => {
     const path = location.pathname.split('/')[1];
     if (path === 'sobre-nos') setAbaAtiva('sobre');
@@ -20,10 +19,10 @@ export default function Institucional() {
       
       {/* Cabeçalho */}
       <header className="bg-dark text-white py-5" style={{ background: 'linear-gradient(135deg, #112b20, #1b4332)' }}>
-        <div className="container text-center py-4">
-          <h1 className="fw-bold mb-3">Boeminha Institucional</h1>
-          <p className="lead opacity-75 mx-auto" style={{ maxWidth: '600px' }}>
-            Transparência, segurança e a nossa missão de conectar você às melhores experiências de Niterói e do Rio.
+        <div className="container py-4">
+          <h1 className="fw-bold mb-2">Boeminha Institucional</h1>
+          <p className="lead opacity-75" style={{ maxWidth: '700px' }}>
+            Nossa missão, políticas de transparência e respostas diretas sobre o funcionamento da principal curadoria de turismo de Niterói.
           </p>
         </div>
       </header>
@@ -31,147 +30,166 @@ export default function Institucional() {
       <main className="container my-5">
         <div className="row g-4">
           
-          {/* Menu Lateral */}
+          {/* Menu Lateral de Navegação */}
           <div className="col-lg-3">
             <div className="bg-white rounded-4 shadow-sm border p-3 sticky-top" style={{ top: '100px' }}>
               <div className="nav flex-column nav-pills gap-2">
-                <button onClick={() => setAbaAtiva('sobre')} className={`nav-link fw-bold text-start rounded-pill ${abaAtiva === 'sobre' ? 'active bg-success text-white' : 'text-dark'}`}>
-                  <i className="fas fa-info-circle me-2"></i> Sobre Nós
+                <button onClick={() => setAbaAtiva('sobre')} className={`nav-link fw-bold text-start rounded-pill py-3 ${abaAtiva === 'sobre' ? 'active bg-success text-white' : 'text-dark'}`}>
+                  Sobre o Projeto
                 </button>
-                <button onClick={() => setAbaAtiva('faq')} className={`nav-link fw-bold text-start rounded-pill ${abaAtiva === 'faq' ? 'active bg-success text-white' : 'text-dark'}`}>
-                  <i className="fas fa-question-circle me-2"></i> FAQ & Ajuda
+                <button onClick={() => setAbaAtiva('faq')} className={`nav-link fw-bold text-start rounded-pill py-3 ${abaAtiva === 'faq' ? 'active bg-success text-white' : 'text-dark'}`}>
+                  Central de Ajuda (FAQ)
                 </button>
-                <button onClick={() => setAbaAtiva('termos')} className={`nav-link fw-bold text-start rounded-pill ${abaAtiva === 'termos' ? 'active bg-success text-white' : 'text-dark'}`}>
-                  <i className="fas fa-file-contract me-2"></i> Termos de Uso
+                <button onClick={() => setAbaAtiva('termos')} className={`nav-link fw-bold text-start rounded-pill py-3 ${abaAtiva === 'termos' ? 'active bg-success text-white' : 'text-dark'}`}>
+                  Termos de Uso
                 </button>
-                <button onClick={() => setAbaAtiva('privacidade')} className={`nav-link fw-bold text-start rounded-pill ${abaAtiva === 'privacidade' ? 'active bg-success text-white' : 'text-dark'}`}>
-                  <i className="fas fa-shield-alt me-2"></i> Privacidade
+                <button onClick={() => setAbaAtiva('privacidade')} className={`nav-link fw-bold text-start rounded-pill py-3 ${abaAtiva === 'privacidade' ? 'active bg-success text-white' : 'text-dark'}`}>
+                  Política de Privacidade
                 </button>
-                <button onClick={() => setAbaAtiva('midiakit')} className={`nav-link fw-bold text-start rounded-pill ${abaAtiva === 'midiakit' ? 'active bg-success text-white' : 'text-dark'}`}>
-                  <i className="fas fa-bullhorn me-2"></i> Mídia Kit
+                <button onClick={() => setAbaAtiva('midiakit')} className={`nav-link fw-bold text-start rounded-pill py-3 ${abaAtiva === 'midiakit' ? 'active bg-success text-white' : 'text-dark'}`}>
+                  Mídia Kit (Para Parceiros)
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Conteúdo das Abas */}
+          {/* Conteúdo Dinâmico */}
           <div className="col-lg-9">
             <div className="bg-white rounded-4 shadow-sm border p-4 p-md-5">
               
+              {/* SOBRE NÓS */}
               {abaAtiva === 'sobre' && (
                 <div className="animation-fade">
-                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Sobre o Boeminha</h3>
-                  <p className="text-muted mb-4" style={{ lineHeight: '1.8' }}>
-                    O Boeminha nasceu nas salas de aula do IFRJ com um propósito claro: resolver a fragmentação do turismo e lazer na nossa região. Percebemos que Niterói possui uma riqueza cultural, histórica e gastronômica imensa, mas muitas vezes inacessível ou desconhecida tanto por turistas quanto pelos próprios moradores.
+                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Nossa História</h3>
+                  <p className="text-muted mb-4 fs-5" style={{ lineHeight: '1.8' }}>
+                    O Boeminha nasceu de uma necessidade real no IFRJ: organizar a rica vida cultural, gastronômica e ecológica de Niterói em uma única plataforma digital.
                   </p>
                   <p className="text-muted mb-4" style={{ lineHeight: '1.8' }}>
-                    Nós somos mais que um catálogo. Somos uma <strong>plataforma curatorial</strong> que digitaliza e profissionaliza o turismo local. Nossa infraestrutura permite que Guias de Turismo tenham autonomia para gerir suas agendas e que donos de estabelecimentos acompanhem o impacto do seu negócio através de dados reais.
+                    Nós notamos que turistas e até moradores enfrentavam dificuldade para encontrar informações centralizadas sobre trilhas no Parque da Cidade, eventos na Praça da Cantareira ou roteiros históricos no Caminho Niemeyer. Além disso, guias de turismo independentes não tinham uma ferramenta tecnológica acessível para gerenciar suas reservas.
                   </p>
-                  <h5 className="fw-bold mt-5 mb-3 text-dark">Nossa Missão</h5>
-                  <p className="text-muted mb-4">Conectar exploradores às experiências mais autênticas da cidade, fomentando a economia criativa local e dando palco para guias independentes e empreendedores.</p>
-                </div>
-              )}
-
-              {abaAtiva === 'faq' && (
-                <div className="animation-fade">
-                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Perguntas Frequentes (FAQ)</h3>
-                  
-                  <div className="mb-4">
-                    <h6 className="fw-bold text-success mb-2">Como funcionam as reservas de roteiros?</h6>
-                    <p className="text-muted small">Ao escolher um roteiro, você define a data no nosso Checkout Seguro e finaliza a compra. O ingresso digital vai automaticamente para a aba "Próximos Eventos" no seu Perfil.</p>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <h6 className="fw-bold text-success mb-2">Quais as formas de pagamento aceitas?</h6>
-                    <p className="text-muted small">Aceitamos PIX (com aprovação instantânea via QR Code ou Copia e Cola) e Cartões de Crédito.</p>
-                  </div>
-
-                  <div className="mb-4">
-                    <h6 className="fw-bold text-success mb-2">Sou guia de turismo, como me cadastro?</h6>
-                    <p className="text-muted small">Basta acessar a página "Anuncie", preencher o formulário selecionando a opção "Guia de Turismo". Nossa administração analisará seu perfil e liberará o acesso ao painel de criação de roteiros.</p>
-                  </div>
-
-                  <div className="mb-4">
-                    <h6 className="fw-bold text-success mb-2">O que é a Nota Média?</h6>
-                    <p className="text-muted small">Após participar de um passeio ou visitar um local, o turista pode deixar uma avaliação de 1 a 5 estrelas no seu histórico de compras. Isso ajuda a manter o padrão de qualidade da nossa comunidade.</p>
-                  </div>
-                </div>
-              )}
-
-              {abaAtiva === 'termos' && (
-                <div className="animation-fade">
-                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Termos de Uso</h3>
-                  <p className="text-muted mb-3">Última atualização: Julho de 2026</p>
-                  <h6 className="fw-bold mt-4 mb-2">1. Aceitação dos Termos</h6>
-                  <p className="text-muted small mb-4">Ao acessar e usar a plataforma Boeminha, você concorda em cumprir e ficar vinculado a estes Termos de Uso. O uso do serviço é restrito a usuários que forneçam informações verdadeiras no cadastro.</p>
-                  
-                  <h6 className="fw-bold mb-2">2. Responsabilidades dos Parceiros</h6>
-                  <p className="text-muted small mb-4">Guias e donos de estabelecimentos são inteiramente responsáveis pela veracidade das informações, roteiros, horários e imagens publicadas em seus respectivos painéis de gestão. O Boeminha atua apenas como intermediador tecnológico.</p>
-
-                  <h6 className="fw-bold mb-2">3. Política de Cancelamento e Cupons</h6>
-                  <p className="text-muted small mb-4">Os cupons gerados pelo painel Business são de responsabilidade do emissor. Cancelamentos de roteiros devem ser solicitados com no mínimo 48 horas de antecedência para reembolso integral.</p>
-                </div>
-              )}
-
-              {abaAtiva === 'privacidade' && (
-                <div className="animation-fade">
-                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Política de Privacidade</h3>
-                  <p className="text-muted mb-4 small" style={{ lineHeight: '1.8' }}>
-                    O Boeminha leva a proteção dos seus dados a sério. Utilizamos infraestrutura do Firebase (Google) para garantir a criptografia e segurança ponta a ponta das suas informações.
+                  <p className="text-muted mb-4" style={{ lineHeight: '1.8' }}>
+                    Hoje, o Boeminha atua como uma ponte. Nós fornecemos a infraestrutura tecnológica — incluindo painéis de gestão, checkouts seguros via PIX e perfis avaliados — para empoderar empreendedores locais e proporcionar aos turistas experiências inesquecíveis e sem atritos.
                   </p>
-                  <ul className="list-unstyled text-muted small">
-                    <li className="mb-3"><i className="fas fa-check text-success me-2"></i> <strong>Dados coletados:</strong> Nome, e-mail, foto de perfil, histórico de compras e comportamento de navegação dentro do site.</li>
-                    <li className="mb-3"><i className="fas fa-check text-success me-2"></i> <strong>Uso dos dados:</strong> Utilizamos suas informações estritamente para processar ingressos, autenticar seu acesso e gerar estatísticas anônimas para os painéis dos nossos parceiros.</li>
-                    <li className="mb-3"><i className="fas fa-check text-success me-2"></i> <strong>Compartilhamento:</strong> Seus dados de contato não são vendidos a terceiros. Apenas seu nome e foto são visíveis nas avaliações públicas.</li>
+                  <h5 className="fw-bold mt-5 mb-3 text-dark">Nossos Pilares</h5>
+                  <ul className="list-group list-group-flush mb-4">
+                    <li className="list-group-item bg-transparent text-muted py-3 px-0 border-light"><strong className="text-dark">Curadoria Ativa:</strong> Todos os locais listados passam por uma triagem para garantir a qualidade da experiência.</li>
+                    <li className="list-group-item bg-transparent text-muted py-3 px-0 border-light"><strong className="text-dark">Empoderamento Local:</strong> Damos visibilidade a guias independentes e pequenos empreendimentos.</li>
+                    <li className="list-group-item bg-transparent text-muted py-3 px-0 border-light"><strong className="text-dark">Tecnologia Simples:</strong> Reservas rápidas, sem burocracia, com bilhetes gerados automaticamente no seu perfil.</li>
                   </ul>
                 </div>
               )}
 
+              {/* FAQ */}
+              {abaAtiva === 'faq' && (
+                <div className="animation-fade">
+                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Dúvidas Frequentes</h3>
+                  
+                  <div className="mb-4">
+                    <h6 className="fw-bold text-dark mb-2 fs-5">Como recebo o ingresso do meu roteiro?</h6>
+                    <p className="text-muted border-start border-success border-3 ps-3 py-1">Após a confirmação do pagamento no checkout, o seu voucher é gerado automaticamente. Basta acessar a página "Perfil" e ele estará na aba "Meus Próximos Eventos", contendo o QR Code e os detalhes do local de encontro com o guia.</p>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h6 className="fw-bold text-dark mb-2 fs-5">O pagamento via PIX é imediato?</h6>
+                    <p className="text-muted border-start border-success border-3 ps-3 py-1">Sim. O sistema utiliza a chave Copia e Cola para aprovação instantânea. Assim que o banco confirmar a transação, a sua vaga no passeio estará garantida.</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <h6 className="fw-bold text-dark mb-2 fs-5">Tenho um bar, como apareço na plataforma?</h6>
+                    <p className="text-muted border-start border-success border-3 ps-3 py-1">Acesse a aba "Seja um Parceiro" no rodapé, preencha o formulário na Etapa 1 e crie o seu anúncio na Etapa 2. A nossa equipe de administração vai avaliar os dados e entrar em contato com você via WhatsApp em até 48h para aprovar o seu Painel Business.</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <h6 className="fw-bold text-dark mb-2 fs-5">Posso cancelar uma compra?</h6>
+                    <p className="text-muted border-start border-success border-3 ps-3 py-1">Sim. O cancelamento pode ser feito com até 48 horas de antecedência ao evento para garantir o reembolso integral, respeitando a agenda de preparação dos guias parceiros.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* TERMOS DE USO */}
+              {abaAtiva === 'termos' && (
+                <div className="animation-fade">
+                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Termos de Uso</h3>
+                  <p className="text-muted mb-4 small">Versão 1.0 - Válida a partir de Julho de 2026</p>
+                  
+                  <h6 className="fw-bold mb-2 text-dark fs-5">1. Definição do Serviço</h6>
+                  <p className="text-muted mb-4">O Boeminha é uma plataforma de classificados digitais e intermediação tecnológica. Nós fornecemos o ambiente virtual (software) para que Guias de Turismo e Donos de Estabelecimentos ofertem seus serviços diretamente ao Consumidor Final (Turista).</p>
+                  
+                  <h6 className="fw-bold mb-2 text-dark fs-5">2. Obrigações dos Parceiros (Guias e Negócios)</h6>
+                  <p className="text-muted mb-4">Ao ter o perfil aprovado pela administração do Boeminha, o parceiro compromete-se a manter preços, horários e rotas atualizados em seu painel. O não comparecimento a um passeio agendado gera advertência e suspensão da conta do Guia.</p>
+
+                  <h6 className="fw-bold mb-2 text-dark fs-5">3. Sistema de Avaliações</h6>
+                  <p className="text-muted mb-4">Os usuários concordam em fornecer avaliações (notas e comentários) baseadas em experiências reais. O Boeminha reserva-se o direito de remover comentários que contenham linguagem imprópria ou difamação sem fundamentação.</p>
+                </div>
+              )}
+
+              {/* PRIVACIDADE */}
+              {abaAtiva === 'privacidade' && (
+                <div className="animation-fade">
+                  <h3 className="fw-bold text-dark mb-4 border-bottom pb-3">Política de Privacidade</h3>
+                  <p className="text-muted mb-4 fs-5">Transparência total sobre como tratamos suas informações.</p>
+                  
+                  <p className="text-muted mb-4" style={{ lineHeight: '1.8' }}>
+                    Toda a arquitetura do Boeminha é sustentada pelos servidores do Firebase. Isso significa que as suas senhas são armazenadas com criptografia de ponta a ponta e nós não temos acesso direto a elas.
+                  </p>
+                  
+                  <h6 className="fw-bold text-dark mt-4 mb-3 fs-5">Dados que coletamos:</h6>
+                  <ul className="list-group list-group-flush mb-4">
+                    <li className="list-group-item bg-transparent text-muted py-2 px-0 border-light"><i className="fas fa-check text-success me-2"></i> <strong>Cadastro:</strong> Nome de exibição, e-mail e tipo de conta.</li>
+                    <li className="list-group-item bg-transparent text-muted py-2 px-0 border-light"><i className="fas fa-check text-success me-2"></i> <strong>Compras:</strong> Armazenamos o histórico de roteiros adquiridos para compor a aba "Histórico" do seu perfil. Não salvamos os números do seu cartão de crédito no nosso banco de dados.</li>
+                    <li className="list-group-item bg-transparent text-muted py-2 px-0 border-light"><i className="fas fa-check text-success me-2"></i> <strong>Pública:</strong> Quando você avalia um local, apenas a sua nota, seu comentário e seu primeiro nome se tornam visíveis para a comunidade.</li>
+                  </ul>
+                </div>
+              )}
+
+              {/* MÍDIA KIT */}
               {abaAtiva === 'midiakit' && (
                 <div className="animation-fade">
                   <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                    <h3 className="fw-bold text-dark m-0">Mídia Kit & Negócios</h3>
-                    <Link to="/anuncie" className="btn btn-dark fw-bold rounded-pill px-4">Seja Parceiro</Link>
+                    <h3 className="fw-bold text-dark m-0">Mídia Kit e Parcerias</h3>
+                    <Link to="/anuncie" className="btn btn-dark fw-bold rounded-pill px-4">Anunciar Agora</Link>
                   </div>
+                  
+                  <p className="text-muted mb-5 fs-5 text-center">Junte-se à vitrine digital que mais cresce em Niterói e coloque o seu negócio no radar de centenas de turistas toda semana.</p>
                   
                   <div className="row g-4 mb-5 text-center">
                     <div className="col-md-4">
-                      <div className="bg-light p-4 rounded-4 border">
-                        <h2 className="fw-bold text-success m-0">+5.000</h2>
-                        <span className="small text-muted fw-bold text-uppercase">Acessos Mensais</span>
+                      <div className="bg-light p-4 rounded-4 border border-2">
+                        <h2 className="fw-bold text-success m-0">+2.500</h2>
+                        <span className="small text-muted fw-bold text-uppercase">Buscas Mensais</span>
                       </div>
                     </div>
                     <div className="col-md-4">
-                      <div className="bg-light p-4 rounded-4 border">
-                        <h2 className="fw-bold text-success m-0">1.284</h2>
-                        <span className="small text-muted fw-bold text-uppercase">Usuários Ativos</span>
+                      <div className="bg-light p-4 rounded-4 border border-2">
+                        <h2 className="fw-bold text-success m-0">98%</h2>
+                        <span className="small text-muted fw-bold text-uppercase">Taxa de Aprovação</span>
                       </div>
                     </div>
                     <div className="col-md-4">
-                      <div className="bg-light p-4 rounded-4 border">
-                        <h2 className="fw-bold text-success m-0">18-35</h2>
-                        <span className="small text-muted fw-bold text-uppercase">Faixa Etária Principal</span>
+                      <div className="bg-light p-4 rounded-4 border border-2">
+                        <h2 className="fw-bold text-success m-0">Público</h2>
+                        <span className="small text-muted fw-bold text-uppercase">Jovem e Engajado</span>
                       </div>
                     </div>
                   </div>
 
-                  <h5 className="fw-bold text-dark mb-3">Por que anunciar no Boeminha?</h5>
-                  <div className="row g-3">
+                  <h5 className="fw-bold text-dark mb-4 text-center">O que o Painel Business oferece?</h5>
+                  <div className="row g-4">
                     <div className="col-md-6">
-                      <div className="d-flex gap-3">
-                        <div className="text-success fs-3"><i className="fas fa-chart-pie"></i></div>
+                      <div className="d-flex gap-3 bg-light p-3 rounded-4 h-100">
+                        <div className="text-success fs-3 mt-1"><i className="fas fa-chart-line"></i></div>
                         <div>
-                          <h6 className="fw-bold mb-1">Painel de Dados Real</h6>
-                          <p className="text-muted small">Acompanhe visualizações, cliques e conversões do seu negócio em tempo real.</p>
+                          <h6 className="fw-bold mb-1 text-dark">Métricas em Tempo Real</h6>
+                          <p className="text-muted small m-0">Saiba exatamente quantos usuários visitaram a sua página, clicaram no seu link ou adicionaram seu roteiro ao carrinho.</p>
                         </div>
                       </div>
                     </div>
                     <div className="col-md-6">
-                      <div className="d-flex gap-3">
-                        <div className="text-success fs-3"><i className="fas fa-ticket-alt"></i></div>
+                      <div className="d-flex gap-3 bg-light p-3 rounded-4 h-100">
+                        <div className="text-success fs-3 mt-1"><i className="fas fa-ticket-alt"></i></div>
                         <div>
-                          <h6 className="fw-bold mb-1">Gerador de Cupons</h6>
-                          <p className="text-muted small">Crie promoções direcionadas exclusivamente para a comunidade engajada da plataforma.</p>
+                          <h6 className="fw-bold mb-1 text-dark">Gerador de Cupons</h6>
+                          <p className="text-muted small m-0">Crie campanhas de desconto focadas, limitadas por data e comande promoções para lotar a sua agenda nos dias de baixo movimento.</p>
                         </div>
                       </div>
                     </div>
