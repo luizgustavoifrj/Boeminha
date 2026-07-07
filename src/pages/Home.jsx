@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { atracoesDb } from '../data/database';
 import { firestore } from '../services/firebase';
+import { useTheme } from '../ThemeContext'; // <-- Modo escuro ativado na Home!
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,6 +13,7 @@ export default function Home() {
   const [anuncios, setAnuncios] = useState([]);
   
   const navigate = useNavigate();
+  const { darkMode } = useTheme(); // Puxando o cérebro das cores
 
   useEffect(() => {
     const buscarAnuncios = async () => {
@@ -69,15 +71,15 @@ export default function Home() {
       
       {/* ESPAÇO PUBLICITÁRIO FIXO / TOPO */}
       <div className="container">
-        <div className="ad-banner-top bg-white border border-dashed rounded-3 d-flex align-items-center justify-content-center text-muted text-uppercase" style={{ height: '90px', margin: '20px auto', maxWidth: '1200px', letterSpacing: '2px', fontSize: '0.75rem' }}>
+        <div className={`ad-banner-top border border-dashed rounded-3 d-flex align-items-center justify-content-center text-uppercase ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white text-muted'}`} style={{ height: '90px', margin: '20px auto', maxWidth: '1200px', letterSpacing: '2px', fontSize: '0.75rem' }}>
           <i className="fas fa-bullhorn me-2"></i> Espaço Publicitário (728x90)
         </div>
       </div>
 
-      {/* CARROSSEL DINÂMICO DE ANÚNCIOS DO SISTEMA (RODA EM LOOP SE HOUVER MAIS DE UM) */}
+      {/* CARROSSEL DINÂMICO DE ANÚNCIOS DO SISTEMA */}
       {anunciosTopo.length > 0 && (
         <div className="container mb-4" style={{ maxWidth: '1200px' }}>
-          <div id="carouselPatrocinadoHome" className="carousel slide shadow-sm rounded-4 overflow-hidden bg-white border" data-bs-ride="carousel" data-bs-interval="4000">
+          <div id="carouselPatrocinadoHome" className={`carousel slide shadow-sm rounded-4 overflow-hidden border ${darkMode ? 'bg-dark border-secondary' : 'bg-white'}`} data-bs-ride="carousel" data-bs-interval="4000">
             <div className="carousel-inner">
               {anunciosTopo.map((anuncio, idx) => (
                 <div className={`carousel-item ${idx === 0 ? 'active' : ''}`} key={anuncio.id}>
@@ -107,7 +109,7 @@ export default function Home() {
 
       {/* HEADER HERO SECTION */}
       <header className="hero-section text-center position-relative mx-3 mb-5 rounded-4" style={{ padding: '100px 0', background: '#1b4332', color: 'white' }}>
-        <div className="hero-bg position-absolute top-0 start-0 w-100 h-100 rounded-4" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+        <div className="hero-bg position-absolute top-0 start-0 w-100 h-100 rounded-4" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: darkMode ? 0.2 : 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
         
         <div className="container hero-content position-relative" style={{ zIndex: 10 }}>
           <h1 className="fw-bold mb-3" style={{ fontSize: '3rem', letterSpacing: '-1px' }}>Descubra a verdadeira Niterói.</h1>
@@ -116,10 +118,10 @@ export default function Home() {
           </p>
           
           <div className="search-container mx-auto position-relative" style={{ maxWidth: '600px', zIndex: 1050 }}>
-            <div className="search-box bg-white p-2 rounded-pill d-flex shadow position-relative" style={{ zIndex: 1060 }}>
+            <div className={`search-box p-2 rounded-pill d-flex shadow position-relative ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`} style={{ zIndex: 1060 }}>
               <input 
                 type="text" 
-                className="form-control border-0 bg-transparent shadow-none px-3 fw-medium text-dark" 
+                className={`form-control border-0 bg-transparent shadow-none px-3 fw-medium ${darkMode ? 'text-white' : 'text-dark'}`}
                 placeholder="O que você quer explorar hoje?" 
                 value={searchQuery}
                 onChange={handleSearchInput}
@@ -134,14 +136,14 @@ export default function Home() {
             </div>
             
             {mostrarSugestoes && sugestoes.length > 0 && (
-              <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2 text-start" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
+              <div className={`position-absolute w-100 shadow-lg rounded-4 mt-2 py-2 text-start ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`} style={{ top: '100%', left: 0, zIndex: 1050, maxHeight: '300px', overflowY: 'auto' }}>
                 {sugestoes.map((sug) => (
                   <div 
                     key={sug.id} 
-                    className="px-4 py-3 text-dark fw-bold d-flex justify-content-between align-items-center"
-                    style={{ cursor: 'pointer', transition: '0.2s', fontSize: '0.95rem', borderBottom: '1px solid #f8f9fa' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
+                    className={`px-4 py-3 fw-bold d-flex justify-content-between align-items-center ${darkMode ? 'text-light' : 'text-dark'}`}
+                    style={{ cursor: 'pointer', transition: '0.2s', fontSize: '0.95rem', borderBottom: darkMode ? '1px solid #333' : '1px solid #f8f9fa' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#333' : '#f8f9fa'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     onClick={() => {
                       setSearchQuery(sug.titulo);
                       setSugestoes([]);
@@ -152,10 +154,10 @@ export default function Home() {
                       <i className="fas fa-map-marker-alt text-success me-3 fs-5"></i>
                       <div className="text-start">
                         {sug.titulo} <br/>
-                        <span className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 500 }}>{sug.tag}</span>
+                        <span className={darkMode ? 'text-secondary' : 'text-muted'} style={{ fontSize: '0.75rem', fontWeight: 500 }}>{sug.tag}</span>
                       </div>
                     </div>
-                    <i className="fas fa-arrow-right text-light opacity-50" style={{ fontSize: '0.8rem' }}></i>
+                    <i className="fas fa-arrow-right opacity-50" style={{ fontSize: '0.8rem', color: darkMode ? '#888' : '#ccc' }}></i>
                   </div>
                 ))}
               </div>
@@ -164,54 +166,62 @@ export default function Home() {
         </div>
       </header>
 
-      {/* BENTO GRID ORIGINAL */}
+      {/* BENTO GRID (AGORA COM FOTOS HD E TEXTOS PROFISSIONAIS) */}
       <section className="container mb-5" style={{ position: 'relative', zIndex: 1 }}>
         <div className="d-flex align-items-center justify-content-between mb-4">
-          <h2 className="fw-bold m-0 text-dark">Experiências em Destaque</h2>
+          <h2 className={`fw-bold m-0 ${darkMode ? 'text-white' : 'text-dark'}`}>Experiências em Destaque</h2>
           <Link to="/explorar" className="text-success text-decoration-none fw-bold">Ver todas as opções <i className="fas fa-arrow-right ms-1"></i></Link>
         </div>
         
         <div className="bento-grid d-grid gap-3" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 220px)' }}>
-          <a href="https://www.ingresso.com" target="_blank" rel="noreferrer" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-star me-1"></i> RECOMENDADO</span>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <p className="small mb-1 text-uppercase text-light opacity-75 fw-bold">Vida Noturna</p>
-              <h3 className="fw-bold mb-0">Samba da cantareira: Ingressos Abertos</h3>
-            </div>
-          </a>
           
-          <Link to="/explorar?busca=boemia" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://conteudo.imguol.com.br/c/entretenimento/d4/2021/02/04/cada-cerveja-tem-um-tipo-especifico-de-copo-para-manter-as-principais-caracteristicas-veja-opcoes-1612483971132_v2_1x1.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-handshake me-1"></i> PARCEIRO</span>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-4 mb-0">Gastronomia Raiz: Os melhores botecos</h3>
+          {/* Card 1: Vida Noturna */}
+          <Link to="/explorar?busca=samba" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://almalondrina.com.br/wp-content/uploads/2018/03/Ziriguidum_23_03_2018.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold shadow"><i className="fas fa-star me-1"></i> IMPERDÍVEL</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-1 text-uppercase text-warning fw-bold" style={{ letterSpacing: '1px' }}>Vida Noturna</p>
+              <h3 className="fw-bold mb-0 text-white" style={{ fontSize: '1.8rem' }}>O autêntico samba de raiz e a boemia niteroiense</h3>
+            </div>
+          </Link>
+          
+          {/* Card 2: Gastronomia */}
+          <Link to="/explorar?busca=boteco" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-success text-white position-absolute top-0 start-0 m-3 fw-bold shadow"><i className="fas fa-utensils me-1"></i> GASTRONOMIA</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <h3 className="fw-bold fs-4 mb-0 text-white">Roteiros de sabor: dos botecos clássicos aos bistrôs</h3>
             </div>
           </Link>
 
-          <Link to="/explorar?busca=natureza" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-5 mb-0">Trilhas Guiadas</h3>
+          {/* Card 3: Trilhas */}
+          <Link to="/explorar?busca=trilha" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdW1PqP3x5CsvLazZ48PnQHV3CApbKjzbtry-7hCqvv8d0tE17nai2G5Mm&s=10')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-0 text-uppercase text-success fw-bold" style={{ letterSpacing: '1px' }}>Ecoturismo</p>
+              <h3 className="fw-bold fs-5 mb-0 text-white">Trilhas & Mirantes</h3>
             </div>
           </Link>
 
-          <Link to="/explorar?busca=cultura" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
-              <h3 className="fw-bold fs-5 mb-0">Cultura e Arte</h3>
+          {/* Card 4: Cultura */}
+          <Link to="/explorar?busca=cultura" className={`bento-item position-relative rounded-4 overflow-hidden text-white text-decoration-none border custom-card-hover ${darkMode ? 'border-secondary' : ''}`} style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}>
+              <p className="small mb-0 text-uppercase text-info fw-bold" style={{ letterSpacing: '1px' }}>Arte</p>
+              <h3 className="fw-bold fs-5 mb-0 text-white">Cultura & História</h3>
             </div>
           </Link>
+          
         </div>
       </section>
 
       {/* ESPAÇO PUBLICITÁRIO EXTRAS / VITRINE DE PATROCINADOS DO MEIO */}
       {anunciosRestantes.length > 0 && (
         <section className="container mb-5">
-          <div className="bg-light p-4 rounded-4 border">
-            <h5 className="fw-bold text-dark mb-3"><i className="fas fa-bullhorn text-success me-2"></i>Destaques da Comunidade Business</h5>
+          <div className={`p-4 rounded-4 border ${darkMode ? 'bg-dark border-secondary' : 'bg-light'}`}>
+            <h5 className={`fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}><i className="fas fa-bullhorn text-success me-2"></i>Destaques da Comunidade Business</h5>
             <div className="row g-3">
               {anunciosRestantes.map(anuncio => (
                 <div className="col-md-4" key={anuncio.id}>
                   <a href={anuncio.link} target="_blank" rel="noreferrer" className="card border-0 shadow-sm rounded-3 overflow-hidden text-decoration-none h-100 custom-card-hover">
                     <img src={anuncio.imagemUrl} alt={anuncio.titulo} style={{ height: '100px', objectFit: 'cover' }} />
-                    <div className="p-2 small fw-bold text-dark text-center text-truncate bg-white">{anuncio.titulo}</div>
+                    <div className={`p-2 small fw-bold text-center text-truncate ${darkMode ? 'bg-secondary text-white' : 'bg-white text-dark'}`}>{anuncio.titulo}</div>
                   </a>
                 </div>
               ))}
@@ -220,42 +230,53 @@ export default function Home() {
         </section>
       )}
 
-      {/* SEÇÃO DE CATEGORIAS (BASEADA NO DESIGN DE image_adbe90.png) */}
+      {/* SEÇÃO DE CATEGORIAS (AGORA SÃO LINKS CLIcÁVEIS) */}
       <section className="container my-5 py-4 text-center">
-        <h2 className="fw-bold text-dark mb-1">Explorando por Categorias</h2>
-        <p className="text-muted mb-5">Tudo o que Niterói tem para oferecer na palma da sua mão.</p>
+        <h2 className={`fw-bold mb-1 ${darkMode ? 'text-white' : 'text-dark'}`}>Explorando por Categorias</h2>
+        <p className={`${darkMode ? 'text-light opacity-75' : 'text-muted'} mb-5`}>Tudo o que Niterói tem para oferecer na palma da sua mão.</p>
         
         <div className="row g-4">
+          {/* Categoria 1: Bares -> Leva ao explorar com busca=boemia */}
           <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-beer"></i></div>
-              <h5 className="fw-bold text-dark">Bares & Botequim</h5>
-              <p className="text-muted small m-0">Os melhores locais para curtir a noite boemia.</p>
-            </div>
+            <Link to="/explorar?busca=boemia" className="text-decoration-none d-block custom-card-hover h-100">
+              <div className={`card border-0 shadow-sm rounded-4 p-4 h-100 ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`}>
+                <div className="text-success fs-1 mb-3"><i className="fas fa-beer"></i></div>
+                <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Bares & Botequim</h5>
+                <p className={`small m-0 ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Os melhores locais para curtir a noite boêmia.</p>
+              </div>
+            </Link>
           </div>
+          
+          {/* Categoria 2: Roteiros -> Leva direto à página de Roteiros */}
           <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-map-marked-alt"></i></div>
-              <h5 className="fw-bold text-dark">Roteiros Exclusivos</h5>
-              <p className="text-muted small m-0">Passeios guiados por especialistas locais.</p>
-            </div>
+            <Link to="/roteiros" className="text-decoration-none d-block custom-card-hover h-100">
+              <div className={`card border-0 shadow-sm rounded-4 p-4 h-100 ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`}>
+                <div className="text-success fs-1 mb-3"><i className="fas fa-map-marked-alt"></i></div>
+                <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Roteiros Exclusivos</h5>
+                <p className={`small m-0 ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Passeios guiados por especialistas locais.</p>
+              </div>
+            </Link>
           </div>
+          
+          {/* Categoria 3: Parceiros -> Leva ao Explorar geral para ver tudo */}
           <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-store"></i></div>
-              <h5 className="fw-bold text-dark">Parceiros Business</h5>
-              <p className="text-muted small m-0">Estabelecimentos verificados e com descontos.</p>
-            </div>
+            <Link to="/explorar" className="text-decoration-none d-block custom-card-hover h-100">
+              <div className={`card border-0 shadow-sm rounded-4 p-4 h-100 ${darkMode ? 'bg-dark border border-secondary' : 'bg-white'}`}>
+                <div className="text-success fs-1 mb-3"><i className="fas fa-store"></i></div>
+                <h5 className={`fw-bold ${darkMode ? 'text-white' : 'text-dark'}`}>Catálogo Completo</h5>
+                <p className={`small m-0 ${darkMode ? 'text-light opacity-75' : 'text-muted'}`}>Estabelecimentos verificados em um só lugar.</p>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* SECTION BUSINESS ORIGINAL */}
-      <section className="business-section bg-white border-top py-5 mt-5">
+      <section className={`business-section py-5 mt-5 ${darkMode ? 'border-top border-secondary' : 'bg-white border-top'}`}>
         <div className="container text-center py-4">
-          <div className="glass-card mx-auto bg-light rounded-4 p-5 border" style={{ maxWidth: '850px' }}>
-            <h2 className="fw-bold mb-3 text-dark">Conecte seu negócio a novos exploradores.</h2>
-            <p className="text-muted mb-4 px-lg-4">
+          <div className={`glass-card mx-auto rounded-4 p-5 ${darkMode ? 'bg-dark border border-secondary' : 'bg-light border'}`} style={{ maxWidth: '850px' }}>
+            <h2 className={`fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}>Conecte seu negócio a novos exploradores.</h2>
+            <p className={`${darkMode ? 'text-light opacity-75' : 'text-muted'} mb-4 px-lg-4`}>
               O BoeMinha é a vitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
             </p>
             <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
@@ -268,7 +289,7 @@ export default function Home() {
       
       <style dangerouslySetInnerHTML={{__html: `
         .custom-card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .custom-card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+        .custom-card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important; }
       `}} />
     </div>
   );

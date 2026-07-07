@@ -34,7 +34,7 @@ export default function Explorar() {
             endereco: d.endereco || 'Niterói, RJ',
             categoria: d.categoria || 'boemia',
             tag: d.tag || 'Destaque',
-            // Define coordenadas falsas em Niterói para o mapa funcionar
+            // Define coordenadas aleatórias em Niterói para o mapa funcionar
             lat: -22.90 + (Math.random() * 0.05),
             lng: -43.10 - (Math.random() * 0.05),
             subtopicos: ['Parceiro Oficial', d.tag]
@@ -209,6 +209,7 @@ export default function Explorar() {
     }
   }, [location.search, todasAtracoes]);
 
+  // Função de filtro corrigida (sem os conflitos do Git)
   const filtrar = (categoria) => {
     setFiltroAtivo(categoria);
     navigate('?'); 
