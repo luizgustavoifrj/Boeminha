@@ -2,71 +2,103 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer style={{ backgroundColor: '#112b20', color: '#e9ecef', paddingTop: '60px', paddingBottom: '20px', marginTop: 'auto', borderTop: '4px solid #2d6a4f' }}>
-      <div className="container">
-        <div className="row g-4 mb-5">
+    <footer style={{ backgroundColor: '#0a1a14', color: '#e9ecef', paddingTop: '80px', borderTop: '4px solid #2d6a4f', marginTop: 'auto' }}>
+      
+      {/* Container Principal */}
+      <div className="container pb-5">
+        <div className="row g-5">
           
-          {/* Coluna 1: Marca e Sobre */}
+          {/* Coluna 1: A Marca */}
           <div className="col-lg-4 col-md-6">
-            <h4 className="fw-bold text-white mb-3"><i className="fas fa-leaf text-success me-2"></i>BOEMINHA.</h4>
-            <p className="small text-white-50 mb-4" style={{ lineHeight: '1.6', paddingRight: '20px' }}>
-              A principal plataforma curatorial de turismo e lazer de Niterói. Conectando você às experiências mais autênticas da cidade com segurança, cultura e praticidade.
+            <Link to="/" className="text-decoration-none">
+              <h3 className="fw-bold text-white mb-3" style={{ letterSpacing: '-1px' }}>
+                <i className="fas fa-map-marked-alt text-success me-2"></i>BOEMINHA<span className="text-success">.</span>
+              </h3>
+            </Link>
+            <p className="small text-white-50 mb-4 pe-lg-4" style={{ lineHeight: '1.8' }}>
+              A bússola oficial da cultura, gastronomia e turismo de Niterói. 
+              Mais do que um catálogo, somos a sua conexão direta com guias independentes e as experiências mais autênticas da cidade.
             </p>
             <div className="d-flex gap-3">
-              <a href="#" className="text-white-50 text-decoration-none fs-5 transition-hover" title="Instagram"><i className="fab fa-instagram"></i></a>
-              <a href="#" className="text-white-50 text-decoration-none fs-5 transition-hover" title="Twitter"><i className="fab fa-twitter"></i></a>
-              <a href="#" className="text-white-50 text-decoration-none fs-5 transition-hover" title="TikTok"><i className="fab fa-tiktok"></i></a>
+              <a href="#" className="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center transition-hover" style={{ width: '38px', height: '38px' }} title="Instagram"><i className="fab fa-instagram fs-6"></i></a>
+              <a href="#" className="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center transition-hover" style={{ width: '38px', height: '38px' }} title="Twitter"><i className="fab fa-twitter fs-6"></i></a>
+              <a href="#" className="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center transition-hover" style={{ width: '38px', height: '38px' }} title="TikTok"><i className="fab fa-tiktok fs-6"></i></a>
             </div>
           </div>
 
-          {/* Coluna 2: Links Rápidos */}
+          {/* Coluna 2: Navegação da Plataforma */}
           <div className="col-lg-2 col-md-6">
-            <h6 className="fw-bold text-white text-uppercase mb-3" style={{ letterSpacing: '1px' }}>Explorar</h6>
-            <ul className="list-unstyled mb-0 d-flex flex-column gap-2 small">
-              <li><Link to="/explorar" className="text-white-50 text-decoration-none transition-hover">Todos os Locais</Link></li>
-              <li><Link to="/roteiros" className="text-white-50 text-decoration-none transition-hover">Roteiros Guiados</Link></li>
-              <li><Link to="/cidades/niteroi" className="text-white-50 text-decoration-none transition-hover">Em Niterói</Link></li>
-              <li><Link to="/cidades/rio" className="text-white-50 text-decoration-none transition-hover">No Rio</Link></li>
+            <h6 className="fw-bold text-white text-uppercase mb-4" style={{ letterSpacing: '1px', fontSize: '0.85rem' }}>A Plataforma</h6>
+            <ul className="list-unstyled d-flex flex-column gap-3 small">
+              <li><Link to="/explorar" className="text-white-50 text-decoration-none custom-link-hover">Explorar Locais</Link></li>
+              <li><Link to="/roteiros" className="text-white-50 text-decoration-none custom-link-hover">Roteiros Guiados</Link></li>
+              <li>
+                <Link to="/anuncie" className="text-white-50 text-decoration-none custom-link-hover d-flex align-items-center">
+                  Área do Parceiro <span className="badge bg-success ms-2" style={{ fontSize: '0.6rem' }}>BUSINESS</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Coluna 3: Institucional */}
+          {/* Coluna 3: Links Institucionais (Integrados com a nova página) */}
           <div className="col-lg-2 col-md-6">
-            <h6 className="fw-bold text-white text-uppercase mb-3" style={{ letterSpacing: '1px' }}>Institucional</h6>
-            <ul className="list-unstyled mb-0 d-flex flex-column gap-2 small">
-              <li><Link to="/sobre-nos" className="text-white-50 text-decoration-none transition-hover">Sobre Nós</Link></li>
-              <li><Link to="/faq" className="text-white-50 text-decoration-none transition-hover">Central de Ajuda</Link></li>
-              <li><Link to="/termos" className="text-white-50 text-decoration-none transition-hover">Termos de Uso</Link></li>
-              <li><Link to="/politica" className="text-white-50 text-decoration-none transition-hover">Privacidade</Link></li>
+            <h6 className="fw-bold text-white text-uppercase mb-4" style={{ letterSpacing: '1px', fontSize: '0.85rem' }}>Transparência</h6>
+            <ul className="list-unstyled d-flex flex-column gap-3 small">
+              <li><Link to="/sobre-nos" className="text-white-50 text-decoration-none custom-link-hover">Nossa História</Link></li>
+              <li><Link to="/faq" className="text-white-50 text-decoration-none custom-link-hover">Central de Ajuda</Link></li>
+              <li><Link to="/termos" className="text-white-50 text-decoration-none custom-link-hover">Termos de Uso</Link></li>
+              <li><Link to="/politica" className="text-white-50 text-decoration-none custom-link-hover">Privacidade</Link></li>
+              <li><Link to="/midia-kit" className="text-white-50 text-decoration-none custom-link-hover">Mídia Kit</Link></li>
             </ul>
           </div>
 
-          {/* Coluna 4: Parceiros e Contato */}
+          {/* Coluna 4: CTA e Clube Boeminha */}
           <div className="col-lg-4 col-md-6">
-            <h6 className="fw-bold text-white text-uppercase mb-3" style={{ letterSpacing: '1px' }}>Negócios</h6>
-            <ul className="list-unstyled mb-4 d-flex flex-column gap-2 small">
-              <li><Link to="/anuncie" className="text-white-50 text-decoration-none transition-hover">Seja um Parceiro</Link></li>
-              <li><Link to="/midia-kit" className="text-white-50 text-decoration-none transition-hover">Mídia Kit</Link></li>
-            </ul>
-            <h6 className="fw-bold text-white text-uppercase mb-2" style={{ letterSpacing: '1px' }}>Newsletter</h6>
-            <div className="input-group input-group-sm">
-              <input type="email" className="form-control bg-dark border-secondary text-white" placeholder="Seu e-mail" />
-              <button className="btn btn-success fw-bold" type="button">Assinar</button>
+            <div className="bg-white bg-opacity-10 p-4 rounded-4 border border-secondary border-opacity-25 shadow-sm">
+              <h6 className="fw-bold text-white text-uppercase mb-2" style={{ letterSpacing: '1px', fontSize: '0.85rem' }}>
+                <i className="fas fa-ticket-alt text-success me-2"></i>Clube Boeminha
+              </h6>
+              <p className="small text-white-50 mb-3" style={{ lineHeight: '1.6' }}>
+                Receba cupons secretos de bares e descontos em roteiros exclusivos direto no seu e-mail. Sem spam, apenas boemia.
+              </p>
+              <form className="input-group" onSubmit={(e) => { e.preventDefault(); alert('Bem-vindo ao Clube Boeminha! Em breve você receberá nossos cupons.'); }}>
+                <input type="email" className="form-control bg-dark border-secondary text-white shadow-none" placeholder="Seu melhor e-mail" required />
+                <button className="btn btn-success fw-bold px-3" type="submit"><i className="fas fa-paper-plane"></i></button>
+              </form>
             </div>
           </div>
 
         </div>
+      </div>
 
-        {/* Linha Final */}
-        <div className="border-top border-secondary pt-3 mt-4 text-center d-flex flex-column flex-md-row justify-content-between align-items-center">
-          <p className="small text-white-50 mb-0">
+      {/* Sub-Footer (Barra Inferior) */}
+      <div className="border-top border-secondary border-opacity-25 py-4" style={{ backgroundColor: '#07120e' }}>
+        <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+          
+          {/* Indicador de Status do Sistema */}
+          <div className="small text-white-50 d-flex align-items-center gap-2">
+            <div className="spinner-grow text-success" style={{ width: '12px', height: '12px', animationDuration: '1.5s' }} role="status"></div>
+            <span className="fw-bold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Sistemas 100% Ativos</span>
+          </div>
+          
+          <p className="small text-white-50 mb-0 text-center">
             &copy; {new Date().getFullYear()} Boeminha. Todos os direitos reservados.
           </p>
-          <div className="mt-2 mt-md-0 text-white-50 small">
-            Feito com <i className="fas fa-heart text-danger mx-1"></i> no IFRJ
+          
+          {/* Assinatura do Projeto */}
+          <div className="small text-white-50 fw-bold">
+            Projeto Final • <span className="text-success">IFRJ</span>
           </div>
         </div>
       </div>
+      
+      {/* Estilo CSS embutido para animação de hover nos links */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-link-hover { transition: color 0.3s ease; }
+        .custom-link-hover:hover { color: #4ade80 !important; }
+        .transition-hover { transition: all 0.3s ease; }
+        .transition-hover:hover { background-color: #198754; color: white !important; border-color: #198754; transform: translateY(-3px); }
+      `}} />
     </footer>
   );
 }
