@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { atracoesDb } from '../data/database';
 import { firestore } from '../services/firebase';
 
 export default function Home() {
-  const [busca, setBusca] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sugestoes, setSugestoes] = useState([]);
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  
+  // Estado para puxar os anúncios reais cadastrados pelos parceiros no banco de dados
   const [anuncios, setAnuncios] = useState([]);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,56 +20,72 @@ export default function Home() {
         const lista = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setAnuncios(lista);
       } catch (error) {
-        console.error("Erro ao buscar anúncios:", error);
+        console.error("Erro ao buscar anúncios patrocinados:", error);
       }
     };
     buscarAnuncios();
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
+  // LÓGICA DE AUTOCOMPLETE INTELIGENTE
+  const handleSearchInput = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    if (query.trim().length > 0) {
+      const filtradas = atracoesDb.filter(attr => 
+        attr.titulo.toLowerCase().includes(query.toLowerCase()) || 
+        attr.tag.toLowerCase().includes(query.toLowerCase()) ||
+        attr.categoria.toLowerCase().includes(query.toLowerCase())
+      );
+      setSugestoes(filtradas);
+      setMostrarSugestoes(true);
+    } else {
+      setSugestoes([]);
+      setMostrarSugestoes(false);
+    }
+  };
+
+  const realizarBusca = (termo) => {
+    const busca = termo || searchQuery;
     if (busca.trim() !== '') {
-      navigate(`/explorar?q=${busca}`);
+      navigate(`/explorar?busca=${encodeURIComponent(busca)}`);
+    } else {
+      navigate(`/explorar`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setMostrarSugestoes(false);
+      realizarBusca();
     }
   };
 
   const anunciosTopo = anuncios.slice(0, 3);
-  const anunciosMeio = anuncios.slice(3, 6);
+  const anunciosRestantes = anuncios.slice(3, 9);
 
   return (
-    <div style={{ paddingTop: '76px', backgroundColor: '#f8fcf9', minHeight: '100vh' }}>
+    <div style={{ paddingTop: '76px' }}>
       
-      {/* 1. HERO SECTION ORIGINAL */}
-      <section className="position-relative d-flex align-items-center" style={{ minHeight: '80vh', backgroundColor: '#112b20', overflow: 'hidden' }}>
-        <div className="position-absolute w-100 h-100" style={{ backgroundImage: "url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Museu_de_Arte_Contempor%C3%A2nea_de_Niter%C3%B3i_-_Rio_de_Janeiro%2C_Brasil.jpg/1200px-Museu_de_Arte_Contempor%C3%A2nea_de_Niter%C3%B3i_-_Rio_de_Janeiro%2C_Brasil.jpg')", backgroundSize: 'cover', backgroundPosition: 'center', opacity: '0.4' }}></div>
-        <div className="container position-relative py-5" style={{ zIndex: 10 }}>
-          <div className="row justify-content-center text-center">
-            <div className="col-lg-8">
-              <h1 className="display-4 fw-bold text-white mb-3">Descubra a verdadeira essência da cidade.</h1>
-              <p className="lead text-white-50 mb-4">Conectamos você às experiências mais autênticas, guias locais e a uma rota inesquecível.</p>
-              
-              <form onSubmit={handleSearch} className="bg-white p-2 rounded-pill shadow-lg d-flex align-items-center mx-auto" style={{ maxWidth: '550px' }}>
-                <i className="fas fa-search text-muted ms-3 fs-5"></i>
-                <input type="text" className="form-control border-0 shadow-none bg-transparent py-2 px-3" placeholder="O que você procura hoje?" value={busca} onChange={(e) => setBusca(e.target.value)} />
-                <button type="submit" className="btn btn-success fw-bold rounded-pill px-4 py-2">Buscar</button>
-              </form>
-            </div>
-          </div>
+      {/* ESPAÇO PUBLICITÁRIO FIXO / TOPO */}
+      <div className="container">
+        <div className="ad-banner-top bg-white border border-dashed rounded-3 d-flex align-items-center justify-content-center text-muted text-uppercase" style={{ height: '90px', margin: '20px auto', maxWidth: '1200px', letterSpacing: '2px', fontSize: '0.75rem' }}>
+          <i className="fas fa-bullhorn me-2"></i> Espaço Publicitário (728x90)
         </div>
-      </section>
+      </div>
 
-      {/* ESPAÇO PUBLICITÁRIO: CARROSSEL NO TOPO */}
+      {/* CARROSSEL DINÂMICO DE ANÚNCIOS DO SISTEMA (RODA EM LOOP SE HOUVER MAIS DE UM) */}
       {anunciosTopo.length > 0 && (
-        <section className="container my-4" style={{ position: 'relative', zIndex: 20 }}>
-          <div id="carouselPatrocinado" className="carousel slide shadow-sm rounded-4 overflow-hidden bg-white border" data-bs-ride="carousel" data-bs-interval="4000">
+        <div className="container mb-4" style={{ maxWidth: '1200px' }}>
+          <div id="carouselPatrocinadoHome" className="carousel slide shadow-sm rounded-4 overflow-hidden bg-white border" data-bs-ride="carousel" data-bs-interval="4000">
             <div className="carousel-inner">
-              {anunciosTopo.map((anuncio, index) => (
-                <div className={`carousel-item ${index === 0 ? 'active' : ''}`} key={anuncio.id}>
-                  <a href={anuncio.link} target="_blank" rel="noopener noreferrer" className="d-block position-relative">
-                    <img src={anuncio.imagemUrl} className="d-block w-100" style={{ height: '140px', objectFit: 'cover' }} alt={anuncio.titulo} />
+              {anunciosTopo.map((anuncio, idx) => (
+                <div className={`carousel-item ${idx === 0 ? 'active' : ''}`} key={anuncio.id}>
+                  <a href={anuncio.link} target="_blank" rel="noreferrer" className="d-block position-relative text-decoration-none">
+                    <img src={anuncio.imagemUrl} className="d-block w-100" style={{ height: '150px', objectFit: 'cover' }} alt={anuncio.titulo} />
                     <div className="position-absolute bottom-0 start-0 w-100 p-2 text-white bg-dark bg-opacity-75 d-flex justify-content-between align-items-center px-3 small">
-                      <span className="badge bg-warning text-dark">PATROCINADO</span>
-                      <span className="fw-bold text-truncate ms-2">{anuncio.titulo}</span>
+                      <span className="badge bg-warning text-dark fw-bold">PATROCINADO BUSINESS</span>
+                      <span className="fw-bold text-truncate ms-2 text-white">{anuncio.titulo}</span>
                     </div>
                   </a>
                 </div>
@@ -71,58 +93,123 @@ export default function Home() {
             </div>
             {anunciosTopo.length > 1 && (
               <>
-                <button className="carousel-control-prev" type="button" data-bs-target="#carouselPatrocinado" data-bs-slide="prev">
+                <button className="carousel-control-prev" type="button" data-bs-target="#carouselPatrocinadoHome" data-bs-slide="prev">
                   <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                 </button>
-                <button className="carousel-control-next" type="button" data-bs-target="#carouselPatrocinado" data-bs-slide="next">
+                <button className="carousel-control-next" type="button" data-bs-target="#carouselPatrocinadoHome" data-bs-slide="next">
                   <span className="carousel-control-next-icon" aria-hidden="true"></span>
                 </button>
               </>
             )}
           </div>
-        </section>
+        </div>
       )}
 
-      {/* 2. DESTAQUES ORIGINAIS */}
-      <section className="container my-5 py-4">
-        <div className="text-center mb-5">
-          <h2 className="fw-bold text-dark">Explorando por Categorias</h2>
-          <p className="text-muted">Tudo o que Niterói tem para oferecer na palma da sua mão.</p>
+      {/* HEADER HERO SECTION */}
+      <header className="hero-section text-center position-relative mx-3 mb-5 rounded-4" style={{ padding: '100px 0', background: '#1b4332', color: 'white' }}>
+        <div className="hero-bg position-absolute top-0 start-0 w-100 h-100 rounded-4" style={{ backgroundImage: 'url(https://www.niteroi.rj.gov.br/wp-content/uploads/2022/05/mac_pordosol.jpg)', opacity: 0.35, backgroundSize: 'cover', backgroundPosition: 'center' }}></div>
+        
+        <div className="container hero-content position-relative" style={{ zIndex: 10 }}>
+          <h1 className="fw-bold mb-3" style={{ fontSize: '3rem', letterSpacing: '-1px' }}>Descubra a verdadeira Niterói.</h1>
+          <p className="lead opacity-75 mx-auto mb-4" style={{ maxWidth: '650px' }}>
+            Trilhas escondidas, a melhor gastronomia e eventos autênticos mapeados por especialistas.
+          </p>
+          
+          <div className="search-container mx-auto position-relative" style={{ maxWidth: '600px', zIndex: 1050 }}>
+            <div className="search-box bg-white p-2 rounded-pill d-flex shadow position-relative" style={{ zIndex: 1060 }}>
+              <input 
+                type="text" 
+                className="form-control border-0 bg-transparent shadow-none px-3 fw-medium text-dark" 
+                placeholder="O que você quer explorar hoje?" 
+                value={searchQuery}
+                onChange={handleSearchInput}
+                onKeyDown={handleKeyDown}
+                onFocus={() => { if(sugestoes.length > 0) setMostrarSugestoes(true); }}
+                onBlur={() => setTimeout(() => setMostrarSugestoes(false), 200)}
+                autoComplete="off"
+              />
+              <button className="btn btn-success rounded-pill px-4 fw-bold" onClick={() => realizarBusca()}>
+                <i className="fas fa-search"></i>
+              </button>
+            </div>
+            
+            {mostrarSugestoes && sugestoes.length > 0 && (
+              <div className="position-absolute w-100 bg-white shadow-lg rounded-4 mt-2 py-2 text-start" style={{ top: '100%', left: 0, zIndex: 1050, border: '1px solid #eee', maxHeight: '300px', overflowY: 'auto' }}>
+                {sugestoes.map((sug) => (
+                  <div 
+                    key={sug.id} 
+                    className="px-4 py-3 text-dark fw-bold d-flex justify-content-between align-items-center"
+                    style={{ cursor: 'pointer', transition: '0.2s', fontSize: '0.95rem', borderBottom: '1px solid #f8f9fa' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#f8f9fa'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
+                    onClick={() => {
+                      setSearchQuery(sug.titulo);
+                      setSugestoes([]);
+                      realizarBusca(sug.titulo);
+                    }}
+                  >
+                    <div className="d-flex align-items-center">
+                      <i className="fas fa-map-marker-alt text-success me-3 fs-5"></i>
+                      <div className="text-start">
+                        {sug.titulo} <br/>
+                        <span className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 500 }}>{sug.tag}</span>
+                      </div>
+                    </div>
+                    <i className="fas fa-arrow-right text-light opacity-50" style={{ fontSize: '0.8rem' }}></i>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="row g-4 text-center">
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-beer"></i></div>
-              <h5 className="fw-bold">Bares & Botecos</h5>
-              <p className="text-muted small">Os melhores locais para curtir a noite boemia.</p>
+      </header>
+
+      {/* BENTO GRID ORIGINAL */}
+      <section className="container mb-5" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <h2 className="fw-bold m-0 text-dark">Experiências em Destaque</h2>
+          <Link to="/explorar" className="text-success text-decoration-none fw-bold">Ver todas as opções <i className="fas fa-arrow-right ms-1"></i></Link>
+        </div>
+        
+        <div className="bento-grid d-grid gap-3" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(2, 220px)' }}>
+          <a href="https://www.ingresso.com" target="_blank" rel="noreferrer" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 2', backgroundImage: "url('https://diariodocomercio.com.br/wp-content/uploads/2023/01/festa-pic.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-star me-1"></i> RECOMENDADO</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
+              <p className="small mb-1 text-uppercase text-light opacity-75 fw-bold">Vida Noturna</p>
+              <h3 className="fw-bold mb-0">Samba da cantareira: Ingressos Abertos</h3>
             </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-route"></i></div>
-              <h5 className="fw-bold">Roteiros Exclusivos</h5>
-              <p className="text-muted small">Passeios guiados por especialistas locais.</p>
+          </a>
+          
+          <Link to="/explorar?busca=boemia" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 2', gridRow: 'span 1', backgroundImage: "url('https://conteudo.imguol.com.br/c/entretenimento/d4/2021/02/04/cada-cerveja-tem-um-tipo-especifico-de-copo-para-manter-as-principais-caracteristicas-veja-opcoes-1612483971132_v2_1x1.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-3 fw-bold"><i className="fas fa-handshake me-1"></i> PARCEIRO</span>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
+              <h3 className="fw-bold fs-4 mb-0">Gastronomia Raiz: Os melhores botecos</h3>
             </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card border-0 shadow-sm rounded-4 p-4 h-100">
-              <div className="text-success fs-1 mb-3"><i className="fas fa-store"></i></div>
-              <h5 className="fw-bold">Parceiros Business</h5>
-              <p className="text-muted small">Estabelecimentos verificados e com descontos.</p>
+          </Link>
+
+          <Link to="/explorar?busca=natureza" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://rotadesonhos.com/wp-content/uploads/2021/02/costao-de-itacoatiara-e-enseada-do-bananal_Moment-1024x576.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
+              <h3 className="fw-bold fs-5 mb-0">Trilhas Guiadas</h3>
             </div>
-          </div>
+          </Link>
+
+          <Link to="/explorar?busca=cultura" className="bento-item position-relative rounded-4 overflow-hidden text-white border" style={{ gridColumn: 'span 1', gridRow: 'span 1', backgroundImage: "url('https://www.guiaviagensbrasil.com/imagens/belo-museu-de-arte-contemporanea-niteroi-rj.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
+            <div className="position-absolute bottom-0 start-0 w-100 p-4" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)' }}>
+              <h3 className="fw-bold fs-5 mb-0">Cultura e Arte</h3>
+            </div>
+          </Link>
         </div>
       </section>
 
-      {/* ESPAÇO PUBLICITÁRIO 2: VITRINE ADICIONAL NO MEIO */}
-      {anunciosMeio.length > 0 && (
+      {/* ESPAÇO PUBLICITÁRIO EXTRAS / VITRINE DE PATROCINADOS DO MEIO */}
+      {anunciosRestantes.length > 0 && (
         <section className="container mb-5">
           <div className="bg-light p-4 rounded-4 border">
-            <h5 className="fw-bold text-dark mb-3"><i className="fas fa-bullhorn text-success me-2"></i>Destaques da Comunidade</h5>
+            <h5 className="fw-bold text-dark mb-3"><i className="fas fa-bullhorn text-success me-2"></i>Destaques da Comunidade Business</h5>
             <div className="row g-3">
-              {anunciosMeio.map(anuncio => (
+              {anunciosRestantes.map(anuncio => (
                 <div className="col-md-4" key={anuncio.id}>
-                  <a href={anuncio.link} target="_blank" rel="noopener noreferrer" className="card border-0 shadow-sm rounded-3 overflow-hidden text-decoration-none h-100">
+                  <a href={anuncio.link} target="_blank" rel="noreferrer" className="card border-0 shadow-sm rounded-3 overflow-hidden text-decoration-none h-100 custom-card-hover">
                     <img src={anuncio.imagemUrl} alt={anuncio.titulo} style={{ height: '100px', objectFit: 'cover' }} />
                     <div className="p-2 small fw-bold text-dark text-center text-truncate bg-white">{anuncio.titulo}</div>
                   </a>
@@ -132,6 +219,57 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* SEÇÃO DE CATEGORIAS (BASEADA NO DESIGN DE image_adbe90.png) */}
+      <section className="container my-5 py-4 text-center">
+        <h2 className="fw-bold text-dark mb-1">Explorando por Categorias</h2>
+        <p className="text-muted mb-5">Tudo o que Niterói tem para oferecer na palma da sua mão.</p>
+        
+        <div className="row g-4">
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-beer"></i></div>
+              <h5 className="fw-bold text-dark">Bares & Botequim</h5>
+              <p className="text-muted small m-0">Os melhores locais para curtir a noite boemia.</p>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-map-marked-alt"></i></div>
+              <h5 className="fw-bold text-dark">Roteiros Exclusivos</h5>
+              <p className="text-muted small m-0">Passeios guiados por especialistas locais.</p>
+            </div>
+          </div>
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+              <div className="text-success fs-1 mb-3"><i className="fas fa-store"></i></div>
+              <h5 className="fw-bold text-dark">Parceiros Business</h5>
+              <p className="text-muted small m-0">Estabelecimentos verificados e com descontos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION BUSINESS ORIGINAL */}
+      <section className="business-section bg-white border-top py-5 mt-5">
+        <div className="container text-center py-4">
+          <div className="glass-card mx-auto bg-light rounded-4 p-5 border" style={{ maxWidth: '850px' }}>
+            <h2 className="fw-bold mb-3 text-dark">Conecte seu negócio a novos exploradores.</h2>
+            <p className="text-muted mb-4 px-lg-4">
+              O BoeMinha é a vitrine oficial do turismo autêntico em Niterói. Impulsione seu restaurante, evento ou passeio em nossa plataforma e alcance um público direcionado.
+            </p>
+            <div className="d-flex flex-wrap justify-content-center gap-3 mt-4">
+              <Link to="/midia-kit" className="btn btn-success rounded-pill px-4 py-2 fw-bold">VER MÍDIA KIT</Link>
+              <Link to="/anuncie" className="btn btn-outline-success rounded-pill px-4 py-2 fw-bold">SEJA UM PARCEIRO</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .custom-card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+      `}} />
     </div>
   );
 }
