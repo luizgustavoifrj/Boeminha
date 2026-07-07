@@ -20,7 +20,7 @@ export default function Roteiros() {
       descricao: "Descubra mirantes secretos na Mata Atlântica que apenas os locais conhecem. Nível moderado, ideal para aventureiros. O trajeto inclui paradas estratégicas para hidratação e fotos panorâmicas da Baía de Guanabara.",
       duracao: "4 horas",
       preco: 45.00,
-      imagem: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Parque_da_Cidade_em_Niter%C3%B3i.jpg/1200px-Parque_da_Cidade_em_Niter%C3%B3i.jpg",
+      imagem: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/f3/bb/36/vista-de-um-dos-mirantes.jpg?w=900&h=-1&s=1",
       guia: { nome: "Aline Silva", foto: "https://randomuser.me/api/portraits/women/32.jpg", avaliacao: 4.9, especialidade: "Ecoturismo", passeiosRealizados: 124 }
     },
     {
